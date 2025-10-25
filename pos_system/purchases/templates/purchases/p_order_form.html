@@ -1,0 +1,112 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Purchase Order Form{% endblock title %}
+
+{% block extra_css %}
+.purchase-form-card {
+    background: #fff;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    width: 400px;
+    margin: 0 auto;
+}
+
+.purchase-form-card select,
+.purchase-form-card textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.popup-card {
+    background: white;
+    padding: 25px 35px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    animation: slideIn 0.4s ease;
+}
+
+.ok-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    margin-top: 15px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.ok-btn:hover {
+    background: #218838;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-10px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h2>Create Purchase Order</h2>
+</div>
+
+<div class="purchase-form-card">
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <!-- <div class="form-row">
+            <select name="vendor" required>
+                <option value="">Select Vendor</option>
+                {% for vendor in vendors %}
+                    <option value="{{ vendor.id }}">{{ vendor.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-row">
+            <textarea name="notes" rows="3" placeholder="Add Notes (optional)"></textarea>
+        </div>
+
+        <div class="form-row">
+            <button type="submit" class="add-btn">Create Purchase Order</button>
+        </div> -->
+    </form>
+</div>
+
+<!-- ✅ Popup shown after creation -->
+{% if order_created %}
+<div class="popup-overlay">
+    <div class="popup-card">
+        <h3>✅ Purchase Order Created!</h3>
+        <p>Your order ID: <strong>{{ order_id }}</strong></p>
+        <form method="get" action="{% url 'purchases:purchase_items_add' order_id %}">
+            <button type="submit" class="ok-btn">OK</button>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

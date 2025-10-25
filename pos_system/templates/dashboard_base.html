@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}{% endblock title %} - POS</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background-color: #f0f9ff;  /* light blue background */
+      color: #0f172a;
+    }
+
+    /* Navbar */
+    .navbar {
+      background-color: #0284c7; /* sky blue */
+      color: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 1.5rem;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+    .navbar h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      letter-spacing: 0.5px;
+    }
+    .navbar a {
+      background-color: #0ea5e9;
+      color: #ffffff;
+      text-decoration: none;
+      padding: 0.4rem 0.9rem;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      transition: background-color 0.3s ease;
+    }
+    .navbar a:hover {
+      background-color: #0369a1;
+    }
+
+    {% block extra_css %}
+    
+    {% endblock extra_css %}
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <div class="navbar">
+    <a href="{% url 'users:dashboard_view' %}"><< Dashboard</a>
+    <h1>POS System</h1>
+    <a href="{% url 'users:logout_view' %}">Logout</a>
+  </div>
+
+  <!-- Content -->
+  <main>
+    {% block content %}
+    
+    {% endblock content %}
+  </main>
+
+
+  <script>
+    {% block extra_js %}
+    
+    {% endblock extra_js %}
+  </script>
+  </body>
+</html>

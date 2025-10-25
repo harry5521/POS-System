@@ -1,0 +1,59 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Dashboard{% endblock title %}
+
+{% block extra_css %}
+  /* Dashboard Content */
+    .content {
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+
+    .content h2 {
+      font-size: 1.4rem;
+      margin-bottom: 2rem;
+      color: #0f172a;
+    }
+
+    /* Dashboard Buttons Grid */
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1.5rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .dashboard-btn {
+      background-color: #38bdf8; /* lighter sky blue */
+      border: none;
+      color: white;
+      font-size: 1rem;
+      padding: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: all 0.25s ease;
+    }
+
+    .dashboard-btn:hover {
+      background-color: #0ea5e9;
+      transform: translateY(-3px);
+    }
+{% endblock extra_css %}
+
+
+{% block content %}
+
+  <div class="content">
+    <h2>Welcome, {{ request.user.username }}</h2>
+    <div class="button-grid">
+      <button class="dashboard-btn" onclick="location.href='{% url 'products:products_list_view' %}'">Products</button>
+      <button class="dashboard-btn" onclick="location.href='{% url 'purchases:purchase_list_view' %}'">Purchase Orders</button>
+      <button class="dashboard-btn" onclick="location.href='#'">Sales</button>
+      <button class="dashboard-btn" onclick="location.href='{% url 'vendor:vendor_list_view' %}'">Vendors</button>
+      <button class="dashboard-btn" onclick="location.href='#'">Reports</button>
+    </div>
+  </div>
+
+{% endblock content %}

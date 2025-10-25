@@ -1,0 +1,166 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Product Form{% endblock title %}
+
+{% block extra_css %}
+.container {
+max-width: 1000px;
+margin: 20px auto;
+margin-bottom: 50px;
+padding: 0 15px;
+}
+
+.page-header {
+display: flex;
+align-items: center;
+justify-content: center;
+margin-bottom: 20px;
+}
+
+.page-header h2 {
+color: #024f83;
+margin: 0;
+font-size: 2rem;
+}
+
+.back-btn {
+background: #0ea5e9;
+color: #fff;
+padding: 6px 12px;
+border-radius: 5px;
+text-decoration: none;
+font-size: 14px;
+}
+
+.product-form-card {
+background: #fff;
+padding: 20px;
+border-radius: 8px;
+box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+margin-bottom: 20px;
+}
+
+.form-row {
+display: flex;
+gap: 15px;
+margin-bottom: 15px;
+}
+
+.form-row input, .form-row textarea,
+.form-row select {
+flex: 1;
+padding: 10px;
+border: 1px solid #ccc;
+border-radius: 6px;
+}
+
+.add-btn {
+background: #0284c7;
+border: none;
+color: #fff;
+padding: 10px 15px;
+border-radius: 6px;
+cursor: pointer;
+transition: background 0.3s;
+}
+
+.add-btn:hover {
+background: #0369a1;
+}
+.back-btn-container {
+text-align: right;
+margin-bottom: 20px;
+}
+.back-btn {
+background: #0284c7;
+border: none;
+color: #fff;
+padding: 6px 15px;
+border-radius: 6px;
+cursor: pointer;
+font-size: 15px;
+text-decoration: none;
+transition: background 0.3s;
+margin-bottom: 20px;
+}
+.back-btn:hover {
+background: #0369a1;
+}
+
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+.form-row {
+flex-direction: column;
+}
+.add-btn {
+width: 100%;
+}
+.back-btn {
+font-size: 13px;
+}
+}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h2>Vendors</h2>
+    </div>
+
+    <div class="back-btn-container">
+        <a href="{% url 'vendor:vendor_list_view' %}" class="back-btn">Vendors List</a>
+    </div>
+
+    {% if messages %}
+    <div class="messages" style="margin-bottom: 20px; border: 1px solid #ccc;">
+        {% for message in messages %}
+        {% if message.tags == "error" %}
+        <div class="message" style="padding: 10px; color: red;">{{ message }}</div>
+        {% else %}
+        <div class="message" style="padding: 10px; color: green;">{{ message }}</div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="product-form-card">
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            <!-- Product Name & Barcode -->
+            <div class="form-row">
+                {{ form.vendor_name }}
+                {{ form.contact_person }}
+            </div>
+            {% if form.vendor_name.errors %}
+            <div class="form-row" style="color: red; font-size: 0.9rem;">
+                {{ form.vendor_name.errors.0 }}
+            </div>
+            {% endif %}
+
+            <!-- Purchase & Sale Price -->
+            <div class="form-row">
+                {{ form.phone }}
+                {{ form.email }}
+            </div>
+            {% if form.phone.errors %}
+            <div class="form-row" style="color: red; font-size: 0.9rem;">
+                {{ form.phone.errors.0 }}
+            </div>
+            {% endif %}
+
+            
+
+            <!-- Category & Submit -->
+            <div class="form-row">
+                {{ form.address }}
+                <button type="submit" class="add-btn">
+                    {% if form.instance and form.instance.pk %}Update Vendor{% else %}+ Add Vendor{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

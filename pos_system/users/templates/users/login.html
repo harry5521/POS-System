@@ -1,0 +1,130 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>POS Login</title>
+  <style>
+    body {
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #f8fafc;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+    .card {
+      width: 100%;
+      max-width: 380px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      padding: 2rem;
+    }
+  .card-heading {
+    text-align: center;
+  }
+  h2 {
+    display: block;
+    font-size: 2rem;           /* smaller sign-in heading */
+    margin: 20px auto;
+    color: #475569;
+    font-weight: 600;
+  }
+
+  /* Optional: smaller muted line under subtitle */
+  h2 small {
+    display: block;
+    font-weight: 400;
+    color: #64748b;
+    margin-top: 0.4rem;
+    font-size: 0.82rem;
+  }
+    .error-message {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fca5a5;
+      padding: 0.75rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.35rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #374151;
+    }
+    input {
+      width: 100%;
+      padding: 0.65rem 0.75rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+    }
+    input:focus {
+      outline: none;
+      border-color: #06b6d4;
+      box-shadow: 0 0 0 2px rgba(6,182,212,0.2);
+    }
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      background: #06b6d4;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 1rem;
+      color: #fff;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0891b2;
+    }
+    .footer {
+      margin-top: 1.2rem;
+      font-size: 0.85rem;
+      text-align: center;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+  <!-- <h1 style="font-size: 2rem; font-weight: bold; text-align: center;">POS System</h1> -->
+  <div class="card">
+    <div class="card-heading">
+      <h2>POS System
+        <small>Sign in with your employee credentials</small>
+      </h2>
+    </div>
+    
+
+    {% if messages %}
+      {% for message in messages %}
+      <div class="error-message">
+        {{ message }}
+      </div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post" action="{% url 'users:login_view' %}">
+      {% csrf_token %}
+      <label for="id_username">Username</label>
+      <input type="text" name="username" id="id_username" required>
+
+      <label for="id_password">Password</label>
+      <input type="password" name="password" id="id_password" required>
+
+      <button type="submit">Login</button>
+    </form>
+
+    <div class="footer">
+      © POS System — Offline Mode
+    </div>
+  </div>
+</body>
+</html>

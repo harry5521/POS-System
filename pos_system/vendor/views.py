@@ -1,0 +1,54 @@
+from django.shortcuts import render
+from django.urls import reverse_lazy
+from django.views.generic import ListView
+from django.views.generic.edit import FormView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
+from .models import Vendor
+from .forms import VendorForm
+from django.db.models import Q
+
+
+# Create your views here.
+
+class VendorFormView(LoginRequiredMixin, CreateView):
+    model = Vendor
+    template_name = 'vendor/vendor_form.html'
+    form_class = VendorForm
+    success_url = reverse_lazy('vendor:vendor_form_view')
+
+    def form_valid(self, form):
+        messages.success(self.request, "Vendor created successfully!")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Please correct the highlighted errors.")
+        return super().form_invalid(form)
+
+class VendorListView(LoginRequiredMixin, ListView):
+    model = Vendor
+    template_name = 'vendor/vendor_list.html'
+    context_object_name = 'vendors'
+
+    def get_queryset(self):
+        query = self.request.GET.get('vendor-search', '')
+
+        vendors = Vendor.objects.all()
+        if query:
+            vendors = Vendor.objects.filter(
+                Q(vendor_name__icontains=query) | Q(email__icontains=query)
+            )
+        return vendors
+
+class VendorUpdateView(LoginRequiredMixin, UpdateView):
+    model = Vendor
+    template_name = 'vendor/vendor_form.html'
+    form_class = VendorForm
+    success_url = reverse_lazy('vendor:vendor_list_view')
+
+
+class VendorDeleteView(LoginRequiredMixin, DeleteView):
+    model = Vendor
+    template_name = 'vendor/vendor_list.html'
+    success_url = reverse_lazy('vendor:vendor_list_view')
