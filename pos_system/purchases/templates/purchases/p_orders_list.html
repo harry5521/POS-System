@@ -4,9 +4,8 @@
 
 {% block extra_css %}
 .container {
-max-width: 1100px;
+max-width: 1200px;
 margin: 30px auto;
-padding: 0 15px;
 }
 
 .page-header {
@@ -68,6 +67,7 @@ cursor: pointer;
 }
 
 .product-table {
+font-size: 15px;
 width: 100%;
 border-collapse: collapse;
 background: #fff;
@@ -106,6 +106,12 @@ font-size: 16px;
 text-decoration: none;
 }
 
+.view {
+background: #00e9faff;
+}
+.add {
+background: #a2ff90ff;
+}
 .edit {
 background: #ffed48ff;
 }
@@ -240,6 +246,37 @@ color: #744210;
         </form>
     </div>
 
+    {% if messages %}
+    {% for message in messages %}
+    <div style="
+            width: 100%;
+            background-color: rgba(40, 167, 69, 0.15);
+            color: #155724;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+            border-radius: 5px;
+            padding: 12px 18px;
+            margin-bottom: 15px;
+            position: relative;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        ">
+        <span>{{ message }}</span>
+        <button type="button" onclick="this.parentElement.style.display='none'" style="
+                position: absolute;
+                top: 8px;
+                right: 12px;
+                background: none;
+                border: none;
+                font-size: 18px;
+                color: #155724;
+                cursor: pointer;
+                font-weight: bold;
+            ">&times;</button>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+
     <table class="product-table">
         <thead>
             <tr>
@@ -249,6 +286,7 @@ color: #744210;
                 <th>Invoice Number</th>
                 <th>Date</th>
                 <th>Total Items</th>
+                <th>Total Amount</th>
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
@@ -259,10 +297,11 @@ color: #744210;
             <tr>
                 <td>{{ forloop.counter }}</td>
                 <td>{{ order.order_id }}</td>
-                <td>{{ order.vendor.name }}</td>
+                <td>{{ order.vendor.vendor_name }}</td>
                 <td>{{ order.invoice_number }}</td>
-                <td>{{ order.date|date:"d M Y" }}</td>
+                <td>{{ order.purchase_date|date:"d M Y" }}</td>
                 <td>{{ order.purchase_order_items.count }}</td>
+                <td>{{ order.total_amount }}</td>
                 <td>
                     {% if order.is_confirmed %}
                     <span class="status confirmed">Confirmed</span>
@@ -272,12 +311,17 @@ color: #744210;
                 </td>
                 <td>
                     <div class="actions">
-                        <a class="action-btn edit" title="Edit"
-                            href="">
+                        <a class="action-btn view" title="View" href="{% url 'purchases:p_order_detail_view' order.pk %}">
+                            🔍
+                        </a>
+                        <a class="action-btn add" title="Add Items" href="{% url 'purchases:p_order_items_form_view' order.pk %}">
+                            ➕
+                        </a>
+                        <a class="action-btn edit" title="Edit" href="">
                             ✏️
                         </a>
                         <!-- Delete icon link -->
-                        <a href="#delete-{{ order.pk }}" class="action-btn delete">🗑️</a>
+                        <a title="Delete" href="#delete-{{ order.pk }}" class="action-btn delete">🗑️</a>
 
                         <!-- Modal Box -->
                         <div id="delete-{{ order.pk }}" class="modal">

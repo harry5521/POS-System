@@ -1,0 +1,251 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Purchase Order Items{% endblock title %}
+
+{% block extra_css %}
+.main-container {
+    padding: 10px 100px; 
+}
+
+/* Order Info Section */
+.order-info {
+    background: #fff;
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.order-info h2 {
+    color: #0077b6;
+    margin-bottom: 15px;
+    font-size: 20px;
+}
+
+.order-meta {
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.order-meta div {
+    background-color: #f2f9ff;
+    border: 1px solid #cde6ff;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: 15px;
+}
+
+/* Items Section */
+.items-section {
+    background: #fff;
+    margin-top: 25px;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.items-section h2 {
+    color: #0077b6;
+    margin-bottom: 15px;
+    font-size: 20px;
+}
+
+/* Table Styling */
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+}
+
+.items-table th, .items-table td {
+    border: 1px solid #d3e2f3;
+    padding: 10px;
+    text-align: left;
+}
+
+.items-table th {
+    background-color: #0077b6;
+    color: #fff;
+    font-weight: 500;
+}
+
+.items-table td {
+    background-color: #f9fcff;
+}
+
+/* Form Inputs */
+.form-control {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #cddfee;
+    border-radius: 4px;
+    background-color: #fff;
+}
+
+/* Buttons */
+.btn-add {
+    background-color: #0077b6;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btn-add:hover {
+    background-color: #005f8d;
+}
+
+.btn-remove {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-remove:hover {
+    background-color: #b02a37;
+}
+
+.submit-container {
+    text-align: right;
+    margin-top: 20px;
+}
+
+.btn-submit {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btn-submit:hover {
+    background-color: #218838;
+}
+
+
+{% endblock extra_css %}
+
+{% block content %}
+
+<div class="main-container">
+
+  <div class="order-info">
+      <h2>Purchase Order Details</h2>
+      <div class="order-meta">
+          <div><strong>Order ID:</strong> <span>{{ order.order_id }}</span></div>
+          <div><strong>Vendor:</strong> <span>{{ order.vendor }}</span></div>
+          <div><strong>Notes:</strong> <span>{{ order.notes }}</span></div>
+      </div>
+  </div>
+
+  <div class="items-section">
+      <h2>Add Purchase Items</h2>
+
+      <form method="post" id="itemsForm">
+          {% csrf_token %}
+          <input type="hidden" name="order_id" value="{{ order.id }}">
+
+          <table class="items-table" id="itemsTable">
+              <thead>
+                  <tr>
+                      <th>#</th>
+                      <th>Product</th>
+                      <th>Quantity</th>
+                      <th>Action</th>
+                  </tr>
+              </thead>
+              <tbody id="itemRows">
+                  <tr>
+                      <td>1</td>
+                      <td>
+                          <select name="product[]" class="form-control" required >
+                              <option value="">Select Product</option>
+                              {% for product in products %}
+                                  <option value="{{ product.pk }}">{{ product.product_name }}</option>
+                              {% endfor %}
+                          </select>
+                      </td>
+                      <td><input type="number" name="quantity[]" class="form-control" min="1" placeholder="Quantity" required></td>
+                      <td><button type="button" class="btn-remove">🗑</button></td>
+                  </tr>
+              </tbody>
+          </table>
+
+          <button type="button" class="btn-add" id="addRowBtn">+ Add Item</button>
+
+          <div class="submit-container">
+              <button type="submit" class="btn-submit">Save Items</button>
+          </div>
+      </form>
+  </div>
+
+</div>
+
+{% endblock content %}
+
+
+{% block extra_js %}
+
+document.addEventListener("DOMContentLoaded", function() {
+    const addBtn = document.getElementById("addRowBtn");
+    const tbody = document.getElementById("itemRows");
+
+    // safety: if elements not found, do nothing
+    if (!addBtn || !tbody) return;
+
+    // Function to update row numbers
+    function updateRowNumbers() {
+        const rows = tbody.querySelectorAll("tr");
+        rows.forEach((row, index) => {
+            const firstTd = row.querySelector("td:first-child");
+            if (firstTd) firstTd.textContent = index + 1;
+        });
+    }
+
+    // Initialize numbering (in case the initial template has rows)
+    updateRowNumbers();
+
+    // Add new row
+    addBtn.addEventListener("click", function() {
+        const firstRow = tbody.querySelector("tr");
+        if (!firstRow) return;
+
+        const newRow = firstRow.cloneNode(true); // deep clone
+
+        // Reset selects/inputs in the cloned row
+        const sel = newRow.querySelector("select");
+        if (sel) sel.selectedIndex = 0;
+
+        const qty = newRow.querySelector("input[name='quantity[]']");
+        if (qty) qty.value = "";
+
+        // Append and update numbering
+        tbody.appendChild(newRow);
+        updateRowNumbers();
+    });
+
+    // Remove a row (delegated)
+    tbody.addEventListener("click", function(e) {
+        const target = e.target;
+        if (target.classList.contains("btn-remove")) {
+            const rows = tbody.querySelectorAll("tr");
+            if (rows.length > 1) {
+                const row = target.closest("tr");
+                if (row) row.remove();
+                updateRowNumbers();
+            } else {
+                // Optional: show message (you can replace with your UI style)
+                alert("At least one item row is required.");
+            }
+        }
+    });
+});
+{% endblock extra_js %}

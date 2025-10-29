@@ -12,6 +12,7 @@ class PurchaseOrderForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        self.fields['vendor'] = Vendor.objects.all()
+        super().__init__(*args, **kwargs)
+        self.fields['vendor'].queryset = Vendor.objects.all()
 
     

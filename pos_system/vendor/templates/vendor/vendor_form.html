@@ -68,7 +68,7 @@ transition: background 0.3s;
 background: #0369a1;
 }
 .back-btn-container {
-text-align: right;
+text-align: left;
 margin-bottom: 20px;
 }
 .back-btn {
@@ -109,7 +109,7 @@ font-size: 13px;
     </div>
 
     <div class="back-btn-container">
-        <a href="{% url 'vendor:vendor_list_view' %}" class="back-btn">Vendors List</a>
+        <a href="{% url 'vendor:vendor_list_view' %}" class="back-btn"><< Back</a>
     </div>
 
     {% if messages %}

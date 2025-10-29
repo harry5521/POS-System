@@ -56,3 +56,6 @@ class PurchaseOrderItem(models.Model):
         # Auto-calculate line total each time
         self.line_total = self.quantity * self.product.purchase_price
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.product} - {self.purchase.order_id}"
