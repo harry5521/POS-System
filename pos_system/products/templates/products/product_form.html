@@ -135,7 +135,7 @@ font-size: 13px;
             </div>
             {% if form.barcode.errors %}
             <div class="form-row" style="color: red; font-size: 0.9rem;">
-                {{ form.barcode.errors.0 }}
+                {{ form.barcode.errors.1 }}
             </div>
             {% endif %}
 
@@ -144,9 +144,14 @@ font-size: 13px;
                 {{ form.purchase_price }}
                 {{ form.sale_price }}
             </div>
+            {% if form.purchase_price.errors %}
+            <div class="form-row" style="color: red; font-size: 0.9rem;">
+                {{ form.purchase_price.errors.1 }}
+            </div>
+            {% endif %}
             {% if form.sale_price.errors %}
             <div class="form-row" style="color: red; font-size: 0.9rem;">
-                {{ form.sale_price.errors.0 }}
+                {{ form.sale_price.errors.1 }}
             </div>
             {% endif %}
 
@@ -155,9 +160,14 @@ font-size: 13px;
                 {{ form.quantity }}
                 {{ form.low_stock }}
             </div>
+            {% if form.quantity.errors %}
+            <div class="form-row" style="color: red; font-size: 0.9rem;">
+                {{ form.quantity.errors.1 }}
+            </div>
+            {% endif %}
             {% if form.low_stock.errors %}
             <div class="form-row" style="color: red; font-size: 0.9rem;">
-                {{ form.low_stock.errors.0 }}
+                {{ form.low_stock.errors.1 }}
             </div>
             {% endif %}
 
@@ -168,7 +178,7 @@ font-size: 13px;
             </div>
             {% if form.vendor.errors %}
             <div class="form-row" style="color: red; font-size: 0.9rem;">
-                {{ form.vendor.errors.0 }}
+                {{ form.vendor.errors.1 }}
             </div>
             {% endif %}            
 
