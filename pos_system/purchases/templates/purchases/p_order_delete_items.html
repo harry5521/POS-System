@@ -1,0 +1,269 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Delete Purchase Order Items{% endblock title %}
+
+{% block extra_css %}
+
+
+.container {
+max-width: 900px;
+margin: 0 auto;
+background: white;
+padding: 20px 30px;
+border-radius: 12px;
+box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+h2 {
+margin-bottom: 15px;
+text-align: center;
+color: #222;
+font-weight: 600;
+}
+
+.order-info {
+display: flex;
+justify-content: space-between;
+flex-wrap: wrap;
+background: #f2f2f2;
+padding: 10px 15px;
+border-radius: 8px;
+margin-bottom: 20px;
+}
+
+.order-info p {
+margin: 5px 0;
+font-size: 14px;
+}
+
+.order-table {
+width: 100%;
+border-collapse: collapse;
+margin-bottom: 20px;
+}
+
+.order-table th,
+.order-table td {
+border: 1px solid #ddd;
+padding: 10px 12px;
+text-align: center;
+}
+
+.order-table th {
+background-color: #fafafa;
+font-weight: 600;
+}
+
+.order-table tr:nth-child(even) {
+background-color: #f7f7f7;
+}
+
+.no-items {
+text-align: center;
+color: #777;
+padding: 20px;
+}
+
+.action-bar {
+text-align: right;
+}
+
+.delete-btn {
+background-color: #d9534f;
+color: white;
+padding: 10px 18px;
+border: none;
+border-radius: 6px;
+cursor: pointer;
+text-decoration: none;
+font-weight: 500;
+transition: background 0.2s;
+}
+
+.delete-btn:hover {
+background-color: #c9302c;
+}
+
+.back-btn-container {
+margin: 30px 200px;
+}
+.back-btn {
+background: #0284c7;
+border: none;
+color: #fff;
+padding: 6px 15px;
+border-radius: 6px;
+cursor: pointer;
+font-size: 15px;
+text-decoration: none;
+transition: background 0.3s;
+}
+.back-btn:hover {
+background: #0369a1;
+}
+
+
+/* Modal base */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+/* Modal box */
+.modal-content {
+  background: #fff;
+  padding: 25px 30px;
+  border-radius: 10px;
+  width: 350px;
+  text-align: center;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+  animation: popIn 0.2s ease-in-out;
+}
+
+/* Modal buttons */
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.btn {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: 0.2s;
+}
+
+.cancel-btn {
+  background: #ccc;
+}
+
+.cancel-btn:hover {
+  background: #b3b3b3;
+}
+
+.confirm-btn {
+  background: #e63946;
+  color: white;
+}
+
+.confirm-btn:hover {
+  background: #c82333;
+}
+
+/* Popup animation */
+@keyframes popIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+
+{% endblock extra_css %}
+
+
+{% block content %}
+
+<div class="back-btn-container">
+        <a href="{% url 'purchases:purchase_list_view' %}" class="back-btn"><< Back</a>
+</div>
+
+<div class="container">
+
+    <h2>Purchase Order #{{ order.order_id }}</h2>
+
+    <div class="order-info">
+        <p><strong>Vendor:</strong> {{ order.vendor.vendor_name }}</p>
+        <p><strong>Date:</strong> {{ order.created_at|date:"d M, Y" }}</p>
+        <p><strong>Total Items:</strong> {{ order.purchase_order_items.count }}</p>
+        <p><strong>Total Items:</strong> {{ order.total_amount}}</p>
+    </div>
+
+    <form method="POST" id="deleteItemsForm">
+        {% csrf_token %}
+        <table class="order-table">
+            <thead>
+                <tr>
+                    <th>Check</th>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Purchase Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td><input type="checkbox" name="delete_items[]" value="{{ item.id }}"></td>
+                    <td>{{ item.product.product_name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.purchase_price }}</td>
+                    <td>{{ item.line_total }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="no-items">No items found for this order.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="action-bar">
+            <!-- <button type="submit" class="delete-btn">Delete Checked Items</button> -->
+             <button type="button" id="openDeleteModal" class="btn delete-btn">Delete Selected Items</button>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div id="deleteModal" class="modal">
+            <div class="modal-content">
+                <h3>Confirm Deletion</h3>
+                <p>Are you sure you want to delete the selected items?</p>
+
+                <div class="modal-actions">
+                    <button type="button" id="cancelDelete" class="btn cancel-btn">Cancel</button>
+                    <button type="submit" form="deleteItemsForm" class="btn confirm-btn">Confirm</button>
+                </div>
+            </div>
+        </div>
+
+
+    </form>
+</div>
+
+
+{% endblock content %}
+
+
+{% block extra_js %}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const modal = document.getElementById("deleteModal");
+  const openBtn = document.getElementById("openDeleteModal");
+  const cancelBtn = document.getElementById("cancelDelete");
+
+  if (openBtn) {
+    openBtn.addEventListener("click", () => {
+      modal.style.display = "flex";
+    });
+  }
+
+  if (cancelBtn) {
+    cancelBtn.addEventListener("click", () => {
+      modal.style.display = "none";
+    });
+  }
+
+  window.onclick = function(e) {
+    if (e.target === modal) modal.style.display = "none";
+  };
+});
+
+{% endblock extra_js %}
+

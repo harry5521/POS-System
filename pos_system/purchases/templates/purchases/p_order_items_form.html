@@ -4,7 +4,7 @@
 
 {% block extra_css %}
 .main-container {
-    padding: 10px 100px; 
+    padding: 30px 100px; 
 }
 
 /* Order Info Section */
@@ -130,12 +130,35 @@
     background-color: #218838;
 }
 
+.back-btn-container {
+text-align: left;
+margin-bottom: 30px;
+}
+.back-btn {
+background: #0284c7;
+border: none;
+color: #fff;
+padding: 6px 15px;
+border-radius: 6px;
+cursor: pointer;
+font-size: 15px;
+text-decoration: none;
+transition: background 0.3s;
+}
+.back-btn:hover {
+background: #0369a1;
+}
+
 
 {% endblock extra_css %}
 
 {% block content %}
 
 <div class="main-container">
+
+    <div class="back-btn-container">
+        <a href="{% url 'purchases:purchase_list_view' %}" class="back-btn"><< Back</a>
+    </div>
 
   <div class="order-info">
       <h2>Purchase Order Details</h2>

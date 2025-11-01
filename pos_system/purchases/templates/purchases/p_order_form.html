@@ -80,19 +80,32 @@ background: #0369a1;
 background: #218838;
 }
 
-@keyframes fadeIn {
-from { opacity: 0; }
-to { opacity: 1; }
+.back-btn-container {
+margin: 30px 50px;
+}
+.back-btn {
+background: #0284c7;
+border: none;
+color: #fff;
+padding: 6px 15px;
+border-radius: 6px;
+cursor: pointer;
+font-size: 15px;
+text-decoration: none;
+transition: background 0.3s;
+}
+.back-btn:hover {
+background: #0369a1;
 }
 
-@keyframes slideIn {
-from { transform: translateY(-10px); opacity: 0; }
-to { transform: translateY(0); opacity: 1; }
-}
 
 {% endblock %}
 
 {% block content %}
+
+<div class="back-btn-container">
+        <a href="{% url 'purchases:purchase_list_view' %}" class="back-btn"><< Back</a>
+</div>
 
 <div class="page-header">
     <h2>Create Purchase Order</h2>

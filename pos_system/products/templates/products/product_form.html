@@ -164,12 +164,42 @@ font-size: 13px;
             <!-- Category & Submit -->
             <div class="form-row">
                 {{ form.category }}
-                <button type="submit" class="add-btn">
-                    {% if form.instance and form.instance.pk %}Update Product{% else %}+ Add Product{% endif %}
-                </button>
+                {{ form.vendor }}
             </div>
+            {% if form.vendor.errors %}
+            <div class="form-row" style="color: red; font-size: 0.9rem;">
+                {{ form.vendor.errors.0 }}
+            </div>
+            {% endif %}            
+
+            <button type="submit" class="add-btn">
+                    {% if form.instance and form.instance.pk %}Update Product{% else %}+ Add Product{% endif %}
+            </button>
         </form>
     </div>
 
 </div>
 {% endblock %}
+
+
+{% block extra_js %}
+
+{% comment %} document.addEventListener('DOMContentLoaded', () => {
+    const barcodeInput = document.getElementById('id_barcode'); // Django gives id="id_<fieldname>"
+    barcodeInput.focus();
+
+    // Optional: auto-submit when Enter is sent by scanner
+    barcodeInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('productForm').submit();
+        }
+    });
+
+    // Optional: always re-focus for next scan
+    barcodeInput.addEventListener('blur', () => {
+        setTimeout(() => barcodeInput.focus(), 200);
+    });
+}); {% endcomment %}
+
+{% endblock extra_js %}

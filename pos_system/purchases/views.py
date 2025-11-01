@@ -111,3 +111,30 @@ class PurchaseOrderItemsFormView(View):
 
         messages.success(request, f"Items Added for Purchase Order {order.order_id}")
         return redirect("purchases:purchase_list_view")
+    
+
+class DeletePurchaseOrderItemsView(View):
+    def get(self, request, *args, **kwargs):
+        order_id = kwargs.get('pk')
+        order = get_object_or_404(PurchaseOrder, pk=order_id)
+        # print(order_id, order.order_id)
+        items = order.purchase_order_items.select_related("product")
+        # print(items)
+        return render(request, "purchases/p_order_delete_items.html", {'order':order, 'items':items})
+    
+    def post(self, request, *args, **kwargs):
+        order_id = kwargs.get('pk')
+        order = get_object_or_404(PurchaseOrder, pk=order_id)
+
+        checked_items = request.POST.getlist("delete_items[]")
+        # print(checked_items)
+
+        for item_id in checked_items:
+            item = get_object_or_404(PurchaseOrderItem, pk=item_id, purchase=order)
+            order.total_amount -= item.line_total
+            item.delete()
+
+        order.total_amount = max(order.total_amount, 0)
+        order.save()
+        messages.success(request, "Selected items have been deleted.")
+        return redirect("purchases:purchase_list_view")

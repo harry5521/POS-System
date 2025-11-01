@@ -287,7 +287,6 @@ color: #744210;
                 <th>Date</th>
                 <th>Total Items</th>
                 <th>Total Amount</th>
-                <th>Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -303,13 +302,6 @@ color: #744210;
                 <td>{{ order.purchase_order_items.count }}</td>
                 <td>{{ order.total_amount }}</td>
                 <td>
-                    {% if order.is_confirmed %}
-                    <span class="status confirmed">Confirmed</span>
-                    {% else %}
-                    <span class="status pending">Pending</span>
-                    {% endif %}
-                </td>
-                <td>
                     <div class="actions">
                         <a class="action-btn view" title="View" href="{% url 'purchases:p_order_detail_view' order.pk %}">
                             🔍
@@ -317,13 +309,13 @@ color: #744210;
                         <a class="action-btn add" title="Add Items" href="{% url 'purchases:p_order_items_form_view' order.pk %}">
                             ➕
                         </a>
-                        <a class="action-btn edit" title="Edit" href="">
-                            ✏️
+                        <a class="action-btn delete" title="Delete Items" href="{% url 'purchases:delete_p_order_items_view' order.pk %}">
+                            🗑️
                         </a>
-                        <!-- Delete icon link -->
+                        <!-- Delete icon link
                         <a title="Delete" href="#delete-{{ order.pk }}" class="action-btn delete">🗑️</a>
 
-                        <!-- Modal Box -->
+                        Modal Box
                         <div id="delete-{{ order.pk }}" class="modal">
                             <div class="modal-content">
                                 <h3>Confirm Deletion</h3>
@@ -336,7 +328,7 @@ color: #744210;
                                     <a href="#" class="cancel-btn">Cancel</a>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
                     </div>
                 </td>

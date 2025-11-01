@@ -1,17 +1,19 @@
 from django import forms
 from .models import Product
+from vendor.models import Vendor
 
 class ProductForm(forms.ModelForm):
 
     class Meta:
         model = Product
         fields = ['product_name', 'barcode', 'purchase_price', 'sale_price',
-                   'quantity', 'low_stock', 'category']
+                   'quantity', 'low_stock', 'vendor', 'category']
         
         widgets = {
             'product_name': forms.TextInput(attrs={
                 'placeholder': 'Product Name',
                 'class': 'input-field',
+                'autofocus': True,
                 'required': True
             }),
             'barcode': forms.TextInput(attrs={
@@ -50,16 +52,28 @@ class ProductForm(forms.ModelForm):
                 ('electronics', 'Electronics'),
                 ('furniture', 'Furniture')
             ]),
+            'vendor': forms.Select(attrs={
+                'class': 'input-field',
+                'required': True
+            },)
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['vendor'].queryset = Vendor.objects.all()
+        self.fields['vendor'].empty_label = "Select Vendor"
 
     def clean(self):
         cleaned_data = super().clean()
         barcode = cleaned_data.get("barcode")
+        vendor = cleaned_data.get("vendor")
         purchase_price = cleaned_data.get("purchase_price")
         sale_price = cleaned_data.get("sale_price")
         quantity = cleaned_data.get("quantity")
         low_stock = cleaned_data.get("low_stock")
+
+        if not vendor:
+            self.add_error('vendor', 'Please select a vendor.')
 
         # --- Barcode uniqueness (skip when updating same product) ---
         if barcode:
