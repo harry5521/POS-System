@@ -34,6 +34,6 @@ class LogoutView(LoginRequiredMixin, View):
         return redirect('users:login_view')
         
 
-class DashboardView(View):
+class DashboardView(LoginRequiredMixin, View):
     def get(self, request):
         return render(request, 'users/dashboard.html')

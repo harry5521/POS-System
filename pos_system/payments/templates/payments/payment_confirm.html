@@ -1,0 +1,223 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Payment Form{% endblock title %}
+
+{% block extra_css %}
+
+.confirm-container {
+  max-width: 900px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 14px;
+  padding: 30px 40px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #eaeaea;
+  padding-bottom: 8px;
+}
+
+.summary-card {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 25px 30px;
+  border: 1px solid #e5e7eb;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px 40px;
+}
+
+.summary-item label {
+  display: block;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.summary-item span {
+  display: inline-block;
+  font-size: 16px;
+  font-weight: 500;
+  color: #222;
+}
+
+.amount {
+  color: #007bff;
+  font-weight: 600;
+}
+
+.due {
+  color: #e63946;
+  font-weight: 600;
+}
+
+.clear {
+  color: #2a9d8f;
+  font-weight: 600;
+}
+
+.notes-box {
+  margin-top: 25px;
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  padding: 15px 18px;
+}
+
+.notes-box label {
+  display: block;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.notes-box p {
+  margin: 0;
+  font-size: 15px;
+  color: #333;
+  line-height: 1.5;
+}
+
+.confirm-form {
+  margin-top: 30px;
+  text-align: right;
+}
+
+.btn-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 10px 24px;
+  font-size: 15px;
+  border-radius: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  font-weight: 500;
+  border: none;
+}
+
+.btn.confirm {
+  background-color: #007bff;
+  color: #fff;
+  transition: 0.3s;
+}
+
+.btn.confirm:hover {
+  background-color: #0069d9;
+}
+
+.btn.cancel {
+  background-color: #f3f4f6;
+  color: #333;
+  border: 1px solid #d1d5db;
+}
+
+.btn.cancel:hover {
+  background-color: #e5e7eb;
+}
+
+
+{% endblock extra_css %}
+
+
+{% block content %}
+
+<div class="confirm-container">
+  <h2 class="page-title">Confirm Payment</h2>
+
+  <div class="summary-card">
+    <div class="summary-grid">
+      <div class="summary-item">
+        <label>Payment Type:</label>
+        <span>{{ data.payment_type|title }}</span>
+      </div>
+
+      <div class="summary-item">
+        <label>Payment Method:</label>
+        <span>{{ data.payment_method|title }}</span>
+      </div>
+
+      {% if data.payment_type == 'customer' and order %}
+      <div class="summary-item">
+        <label>Customer:</label>
+        <span>{{ order.customer.name }}</span>
+      </div>
+
+      <div class="summary-item">
+        <label>Sales Order:</label>
+        <span>{{ order.invoice_number }}</span>
+      </div>
+      {% elif data.payment_type == 'vendor' and order %}
+      <div class="summary-item">
+        <label>Vendor:</label>
+        <span>{{ order.vendor.vendor_name }}</span>
+      </div>
+
+      <div class="summary-item">
+        <label>Purchase Order:</label>
+        <span>{{ order.invoice_number }}</span>
+      </div>
+      {% endif %}
+
+      <div class="summary-item">
+        <label>#Invoice:</label>
+        <span>{{ purchase_order.invoice_number }}</span>
+      </div>
+
+      <div class="summary-item">
+        <label>Bill Status:</label>
+        <span>{{ purchase_order.status }}</span>
+      </div>
+
+      <div class="summary-item">
+        <label>Total Bill:</label>
+        <span>{{ purchase_order.total_amount }}</span>
+      </div>
+
+      <div class="summary-item">
+        <label>Remaining Bill:</label>
+        <span>{{ purchase_order.remaining_amount }}</span>
+      </div>
+
+      <div class="summary-item">
+        <label>Amount:</label>
+        <span class="amount">{{ data.amount }}</span>
+      </div>
+
+      <div class="summary-item">
+        <label>Reference No:</label>
+        <span>{{ data.reference_no|default:"—" }}</span>
+      </div>
+
+      
+    </div>
+
+    <div class="notes-box">
+      <label>Notes:</label>
+      <p>{{ data.notes|default:"No additional notes." }}</p>
+    </div>
+
+    <form method="post" class="confirm-form">
+      {% csrf_token %}
+      <div class="btn-group">
+        <a href="{% url 'payments:cancel_payment' %}" class="btn btn-secondary">↩ Cancel</a>
+        <button type="submit" class="btn confirm">Confirm Payment</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+{% endblock content %}

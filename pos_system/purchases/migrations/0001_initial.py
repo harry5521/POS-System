@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('order_id', models.CharField(default=purchases.models.generate_order_id, max_length=20, unique=True)),
-                ('invoice_number', models.CharField(default=purchases.models.get_invoice_number, editable=False, max_length=50, unique=True)),
+                ('invoice_number', models.CharField(default=purchases.models.generate_invoice_number, editable=False, max_length=50, unique=True)),
                 ('purchase_date', models.DateField(default=django.utils.timezone.now)),
                 ('total_amount', models.DecimalField(decimal_places=2, default=0, max_digits=10)),
                 ('notes', models.TextField(blank=True, null=True)),

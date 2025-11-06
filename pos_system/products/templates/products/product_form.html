@@ -135,7 +135,9 @@ font-size: 13px;
             </div>
             {% if form.barcode.errors %}
             <div class="form-row" style="color: red; font-size: 0.9rem;">
-                {{ form.barcode.errors.1 }}
+                {% for error in form.barcode.errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
             </div>
             {% endif %}
 
@@ -146,12 +148,16 @@ font-size: 13px;
             </div>
             {% if form.purchase_price.errors %}
             <div class="form-row" style="color: red; font-size: 0.9rem;">
-                {{ form.purchase_price.errors.1 }}
+                {% for error in form.purchase_price.errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
             </div>
             {% endif %}
             {% if form.sale_price.errors %}
             <div class="form-row" style="color: red; font-size: 0.9rem;">
-                {{ form.sale_price.errors.1 }}
+                {% for error in form.sale_price.errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
             </div>
             {% endif %}
 
@@ -162,12 +168,16 @@ font-size: 13px;
             </div>
             {% if form.quantity.errors %}
             <div class="form-row" style="color: red; font-size: 0.9rem;">
-                {{ form.quantity.errors.1 }}
+                {% for error in form.quantity.errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
             </div>
             {% endif %}
             {% if form.low_stock.errors %}
             <div class="form-row" style="color: red; font-size: 0.9rem;">
-                {{ form.low_stock.errors.1 }}
+                {% for error in form.low_stock.errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
             </div>
             {% endif %}
 

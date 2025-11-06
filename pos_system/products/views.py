@@ -18,8 +18,10 @@ class ProductFormView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('products:product_form_view')
     
     def form_valid(self, form):
-        messages.success(self.request, "Product created successfully!")
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        product = self.object.product_name
+        messages.success(self.request, f"Product '{product}' created successfully!")
+        return response
 
     def form_invalid(self, form):
         messages.error(self.request, "Please correct the highlighted errors.")
@@ -46,6 +48,12 @@ class ProductUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'products/product_form.html'
     form_class = ProductForm
     success_url = reverse_lazy('products:products_list_view')
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        product = self.object.product_name
+        messages.success(self.request, f"Product '{product}' updated successfully!")
+        return response
 
 
 class ProductDeleteView(LoginRequiredMixin, DeleteView):

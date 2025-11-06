@@ -128,31 +128,41 @@ font-size: 13px;
         <form method="post" novalidate>
             {% csrf_token %}
 
-            <!-- Product Name & Barcode -->
+            <!-- Vendor Name & Person -->
             <div class="form-row">
                 {{ form.vendor_name }}
                 {{ form.contact_person }}
             </div>
             {% if form.vendor_name.errors %}
             <div class="form-row" style="color: red; font-size: 0.9rem;">
-                {{ form.vendor_name.errors.0 }}
+                {% for error in form.vendor_name.errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.contact_person.errors %}
+            <div class="form-row" style="color: red; font-size: 0.9rem;">
+                {% for error in form.contact_person.errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
             </div>
             {% endif %}
 
-            <!-- Purchase & Sale Price -->
+            <!-- Phone & Email -->
             <div class="form-row">
                 {{ form.phone }}
                 {{ form.email }}
             </div>
             {% if form.phone.errors %}
             <div class="form-row" style="color: red; font-size: 0.9rem;">
-                {{ form.phone.errors.0 }}
+                {% for error in form.phone.errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
             </div>
             {% endif %}
 
-            
 
-            <!-- Category & Submit -->
+            <!-- Address & Submit -->
             <div class="form-row">
                 {{ form.address }}
                 <button type="submit" class="add-btn">

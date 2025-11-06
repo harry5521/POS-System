@@ -1,0 +1,168 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Payment Form{% endblock title %}
+
+{% block extra_css %}
+
+.payment-container {
+    width: 70%;
+    margin: 40px auto;
+    background: #f1f8ff;
+    padding: 25px 35px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.title {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #004aad;
+    font-weight: 600;
+}
+
+.payment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 3px rgba(0,123,255,0.4);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.btn {
+    border: none;
+    padding: 8px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-secondary {
+    background-color: #e3e3e3;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background-color: #cfcfcf;
+}
+
+
+{% endblock extra_css %}
+
+
+{% block content %}
+<div class="payment-container">
+    <h2 class="title">Record Payment</h2>
+
+    <form method="POST" class="payment-form">
+        {% csrf_token %}
+
+        <div class="form-row">
+            <div class="form-group">{{ form.payment_type.label_tag }} {{ form.payment_type }}</div>
+            <div class="form-group">{{ form.payment_method.label_tag }} {{ form.payment_method }}</div>
+        </div>
+
+        <div class="form-row" id="customer-fields">
+            <div class="form-group">{{ form.customer.label_tag }} {{ form.customer }}</div>
+            <div class="form-group">{{ form.sales_order.label_tag }} {{ form.sales_order }}</div>
+        </div>
+
+        <div class="form-row" id="vendor-fields">
+            <div class="form-group">{{ form.vendor.label_tag }} {{ form.vendor }}</div>
+            <div class="form-group">{{ form.purchase_order.label_tag }} {{ form.purchase_order }}</div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">{{ form.amount.label_tag }} {{ form.amount }}</div>
+            <div class="form-group">{{ form.reference_no.label_tag }} {{ form.reference_no }}</div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group" style="grid-column: span 2;">
+                {{ form.notes.label_tag }} {{ form.notes }}
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Next >></button>
+            <a href="{% url 'payments:payments_list_view' %}" class="btn btn-secondary">↩ Cancel</a>
+        </div>
+    </form>
+</div>
+
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+const paymentType = document.getElementById("id_payment_type");
+const customerFields = document.getElementById("customer-fields");
+const vendorFields = document.getElementById("vendor-fields");
+
+function togglePaymentType() {
+    const type = paymentType.value;
+    if (type === "customer") {
+        customerFields.style.display = "grid";
+        vendorFields.style.display = "none";
+    } else if (type === "vendor") {
+        vendorFields.style.display = "grid";
+        customerFields.style.display = "none";
+    } else {
+        vendorFields.style.display = "none";
+        customerFields.style.display = "none";
+    }
+}
+
+togglePaymentType();
+paymentType.addEventListener("change", togglePaymentType);
+
+
+{% endblock extra_js %}

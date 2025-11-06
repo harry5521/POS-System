@@ -6,11 +6,14 @@ from django.utils import timezone
 import random, string
 
 
-def get_invoice_number():
-    alpnum = string.ascii_uppercase + string.digits
-    end = ''.join(random.choices(alpnum, k=12))
-    numbers = ''.join(random.choices(string.digits, k=10))
-    return f"INV-{numbers}-{end}"
+def generate_invoice_number():
+    while True:
+        alpnum = string.ascii_uppercase + string.digits
+        end = ''.join(random.choices(alpnum, k=5))
+        numbers = ''.join(random.choices(string.digits, k=5))
+        invoice = f"INV-{numbers}-{end}"
+        if not PurchaseOrder.objects.filter(invoice_number=invoice).exists():
+            return invoice
 
 def generate_order_id():
     prefix = "P-ORDER-"
@@ -29,21 +32,27 @@ def generate_order_id():
 
 
 class PurchaseOrder(models.Model):
+    STATUS_CHOICES = [
+        ('unpaid', 'Unpaid'),
+        ('partial', 'Partial'),
+        ('paid', 'Paid'),
+    ]
+
     order_id = models.CharField(unique=True, max_length=20, default=generate_order_id)
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name="purchase_orders")
-    invoice_number = models.CharField(max_length=50, unique=True, default=get_invoice_number, editable=False)
+    invoice_number = models.CharField(max_length=50, unique=True, default=generate_invoice_number, editable=False)
     purchase_date = models.DateField(default=timezone.now)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    remaining_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     notes = models.TextField(blank=True, null=True)
-    is_confirmed = models.BooleanField(default=False)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='unpaid')
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="created_purchase_order")
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Purchase #{self.invoice_number} - {self.vendor.vendor_name}"
+        return f"Purchase - #{self.invoice_number} - {self.vendor.vendor_name}"
     
-
 
 class PurchaseOrderItem(models.Model):
     purchase = models.ForeignKey(PurchaseOrder, on_delete=models.CASCADE, related_name="purchase_order_items")

@@ -51,8 +51,9 @@
       <button class="dashboard-btn" onclick="location.href='{% url 'products:products_list_view' %}'">Products</button>
       <button class="dashboard-btn" onclick="location.href='{% url 'customer:customer_list_view' %}'">Customers</button>
       <button class="dashboard-btn" onclick="location.href='{% url 'purchases:purchase_list_view' %}'">Purchase Orders</button>
-      <button class="dashboard-btn" onclick="location.href='#'">Sales</button>
+      <button class="dashboard-btn" onclick="location.href='{% url 'sales:sales_list_view' %}'">Sales</button>
       <button class="dashboard-btn" onclick="location.href='{% url 'vendor:vendor_list_view' %}'">Vendors</button>
+      <button class="dashboard-btn" onclick="location.href='{% url 'payments:payments_list_view' %}'">Payments</button>
       <button class="dashboard-btn" onclick="location.href='#'">Reports</button>
     </div>
   </div>

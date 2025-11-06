@@ -1,10 +1,10 @@
 {% extends "dashboard_base.html" %}
 
-{% block title %}Vendor List{% endblock title %}
+{% block title %}Product List{% endblock title %}
 
 {% block extra_css %}
 .container {
-max-width: 1100px;
+max-width: 1250px;
 margin: 30px auto;
 padding: 0 15px;
 }
@@ -214,88 +214,59 @@ max-width: 100%;
 {% block content %}
 <div class="container">
     <div class="page-header">
-        <h2>All Vendors</h2>
+        <h2>All Sales</h2>
     </div>
 
     <div class="search-bar">
-        <a href="{% url 'vendor:vendor_form_view' %}" class="back-btn">+ Add New Vendor</a>
+        <a href="" class="back-btn">+ Add New Sale</a>
         <form>
             <div>
-                <input type="text" name="vendor-search" placeholder="Search by vendor name or email">
+                <input type="text" name="sale-search" placeholder="Search by Order-ID / Invoice / Customer / Status">
                 <button type="submit">Search</button>
             </div>
         </form>
     </div>
 
-    {% if messages %}
-    {% for message in messages %}
-    <div style="
-            width: 100%;
-            background-color: rgba(40, 167, 69, 0.15);
-            color: #155724;
-            border: 1px solid rgba(40, 167, 69, 0.3);
-            border-radius: 5px;
-            padding: 12px 18px;
-            margin-bottom: 15px;
-            position: relative;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        ">
-        <span>{{ message }}</span>
-        <button type="button" onclick="this.parentElement.style.display='none'" style="
-                position: absolute;
-                top: 8px;
-                right: 12px;
-                background: none;
-                border: none;
-                font-size: 18px;
-                color: #155724;
-                cursor: pointer;
-                font-weight: bold;
-            ">&times;</button>
-    </div>
-    {% endfor %}
-    {% endif %}
-
-
     <table class="product-table">
         <thead>
             <tr>
                 <th>#</th>
-                <th>Vendor Name</th>
-                <th>Contact Person</th>
-                <th>Phone</th>
-                <th>Email</th>
-                <th>Address</th>
+                <th>Sale-ID</th>
+                <th>Customer</th>
+                <th>Invoice-No</th>
+                <th>Status</th>
+                <th>Total Amount</th>
+                <th>Created</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            {% if vendors %}
-            {% for vendor in vendors %}
+            {% if sales_orders %}
+            {% for sale in sales_orders %}
             <tr>
                 <td>{{ forloop.counter }}</td>
-                <td>{{ vendor.vendor_name }}</td>
-                <td>{{ vendor.contact_person }}</td>
-                <td>{{ vendor.phone }}</td>
-                <td>{{ vendor.email }}</td>
-                <td>{{ vendor.address }}</td>
+                <td>{{ sale.order_id }}</td>
+                <td>{{ sale.customer.name }}</td>
+                <td>{{ sale.invoice_number }}</td>
+                <td>{{ sale.status }}</td>
+                <td>{{ sale.total_amount }}</td>
+                <td>{{ sale.created_at }}</td>
                 <td>
                     <div class="actions">
                         <a class="action-btn edit" title="Edit"
-                            href="{% url 'vendor:vendor_update_view' vendor.pk %}">
+                            href="{">
                             ✏️
                         </a>
                         <!-- Delete icon link -->
-                        <a href="#delete-{{ vendor.pk }}" class="action-btn delete">🗑️</a>
+                        <a href="#delete-{{ sale.pk }}" class="action-btn delete">🗑️</a>
 
                         <!-- Modal Box -->
-                        <div id="delete-{{ vendor.pk }}" class="modal">
+                        <div id="delete-{{ sale.pk }}" class="modal">
                             <div class="modal-content">
                                 <h3>Confirm Deletion</h3>
-                                <p>Are you sure you want to delete <strong>{{ vendor.vendor_name }}</strong>?</p>
+                                <p>Are you sure you want to delete <strong>{{ sale.pk }}</strong>?</p>
                                 <div class="modal-actions">
-                                    <form method="post" action="{% url 'vendor:vendor_delete_view' vendor.pk %}">
+                                    <form method="post" action="">
                                         {% csrf_token %}
                                         <button type="submit" class="confirm-btn">Yes, Delete</button>
                                     </form>
@@ -310,7 +281,7 @@ max-width: 100%;
             {% endfor %}
             {% else %}
             <tr>
-                <td colspan="9" class="no-products">No Vendors available</td>
+                <td colspan="9" class="no-products">No Sales available</td>
             </tr>
             {% endif %}
         </tbody>

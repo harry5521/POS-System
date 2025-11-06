@@ -28,8 +28,8 @@ class PurchaseListView(LoginRequiredMixin, ListView):
             )
         return p_orders
 
-    
-class PurchaseOrderFormView(CreateView):
+
+class PurchaseOrderFormView(LoginRequiredMixin, CreateView):
     model = PurchaseOrder
     template_name = 'purchases/p_order_form.html'
     form_class = PurchaseOrderForm
@@ -40,8 +40,8 @@ class PurchaseOrderFormView(CreateView):
         order_id = self.object.order_id
         messages.success(self.request, f"Purchase Order with {order_id} has been created.")
         return response
-    
-class PurchaseOrderDetailView(DetailView):
+
+class PurchaseOrderDetailView(LoginRequiredMixin, DetailView):
     model = PurchaseOrder
     template_name = 'purchases/p_order_detail.html'
     context_object_name = 'order'
@@ -50,8 +50,8 @@ class PurchaseOrderDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context["items"] = self.object.purchase_order_items.select_related("product")
         return context
-    
-class PurchaseOrderItemsFormView(View):
+
+class PurchaseOrderItemsFormView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         order_id = kwargs.get('pk')
@@ -113,7 +113,7 @@ class PurchaseOrderItemsFormView(View):
         return redirect("purchases:purchase_list_view")
     
 
-class DeletePurchaseOrderItemsView(View):
+class DeletePurchaseOrderItemsView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         order_id = kwargs.get('pk')
         order = get_object_or_404(PurchaseOrder, pk=order_id)

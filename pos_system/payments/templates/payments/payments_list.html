@@ -1,12 +1,11 @@
 {% extends "dashboard_base.html" %}
 
-{% block title %}Vendor List{% endblock title %}
+{% block title %}Product List{% endblock title %}
 
 {% block extra_css %}
 .container {
-max-width: 1100px;
+max-width: 1200px;
 margin: 30px auto;
-padding: 0 15px;
 }
 
 .page-header {
@@ -68,6 +67,7 @@ cursor: pointer;
 }
 
 .product-table {
+font-size: 15px;
 width: 100%;
 border-collapse: collapse;
 background: #fff;
@@ -106,6 +106,12 @@ font-size: 16px;
 text-decoration: none;
 }
 
+.view {
+background: #00e9faff;
+}
+.add {
+background: #a2ff90ff;
+}
 .edit {
 background: #ffed48ff;
 }
@@ -208,20 +214,33 @@ align-items: stretch;
 .search-bar input {
 max-width: 100%;
 }
+.status {
+padding: 4px 8px;
+border-radius: 6px;
+font-size: 0.85rem;
+font-weight: 500;
+}
+.status.confirmed {
+background: #c6f6d5;
+color: #276749;
+}
+.status.pending {
+background: #fefcbf;
+color: #744210;
 }
 {% endblock %}
 
 {% block content %}
 <div class="container">
     <div class="page-header">
-        <h2>All Vendors</h2>
+        <h2>All Payments</h2>
     </div>
 
     <div class="search-bar">
-        <a href="{% url 'vendor:vendor_form_view' %}" class="back-btn">+ Add New Vendor</a>
+        <a href="{% url 'payments:payment_form_view' %}" class="back-btn">+ Add New Payment</a>
         <form>
             <div>
-                <input type="text" name="vendor-search" placeholder="Search by vendor name or email">
+                <input type="text" name="payment-search" placeholder="Search by name or barcode">
                 <button type="submit">Search</button>
             </div>
         </form>
@@ -262,55 +281,41 @@ max-width: 100%;
         <thead>
             <tr>
                 <th>#</th>
-                <th>Vendor Name</th>
-                <th>Contact Person</th>
-                <th>Phone</th>
-                <th>Email</th>
-                <th>Address</th>
+                <th>Customer</th>
+                <th>Vendor</th>
+                <th>Reference Number</th>
+                <th>Amount</th>
+                <th>Created by</th>
+                <th>Created at</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            {% if vendors %}
-            {% for vendor in vendors %}
+            {% if payments %}
+            {% for payment in payments %}
             <tr>
                 <td>{{ forloop.counter }}</td>
-                <td>{{ vendor.vendor_name }}</td>
-                <td>{{ vendor.contact_person }}</td>
-                <td>{{ vendor.phone }}</td>
-                <td>{{ vendor.email }}</td>
-                <td>{{ vendor.address }}</td>
+                <td>{{ payment.customer.name }}</td>
+                <td>{{ payment.vendor.vendor_name }}</td>
+                <td>{{ payment.reference_no }}</td>
+                <td>{{ payment.amount }}</td>
+                <td>{{ payment.created_by }}</td>
+                <td>{{ payment.created_at|date:"d M Y" }}</td>
                 <td>
                     <div class="actions">
-                        <a class="action-btn edit" title="Edit"
-                            href="{% url 'vendor:vendor_update_view' vendor.pk %}">
-                            ✏️
+                        <a class="action-btn view" title="View" href="{% url 'purchases:p_order_detail_view' order.pk %}">
+                            🔍
                         </a>
-                        <!-- Delete icon link -->
-                        <a href="#delete-{{ vendor.pk }}" class="action-btn delete">🗑️</a>
-
-                        <!-- Modal Box -->
-                        <div id="delete-{{ vendor.pk }}" class="modal">
-                            <div class="modal-content">
-                                <h3>Confirm Deletion</h3>
-                                <p>Are you sure you want to delete <strong>{{ vendor.vendor_name }}</strong>?</p>
-                                <div class="modal-actions">
-                                    <form method="post" action="{% url 'vendor:vendor_delete_view' vendor.pk %}">
-                                        {% csrf_token %}
-                                        <button type="submit" class="confirm-btn">Yes, Delete</button>
-                                    </form>
-                                    <a href="#" class="cancel-btn">Cancel</a>
-                                </div>
-                            </div>
-                        </div>
-
+                        <a class="action-btn add" title="Add Items" href="{% url 'purchases:p_order_items_form_view' order.pk %}">
+                            ➕
+                        </a>
                     </div>
                 </td>
             </tr>
             {% endfor %}
             {% else %}
             <tr>
-                <td colspan="9" class="no-products">No Vendors available</td>
+                <td colspan="9" class="no-products">No payments available</td>
             </tr>
             {% endif %}
         </tbody>

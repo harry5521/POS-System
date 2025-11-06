@@ -19,8 +19,10 @@ class VendorFormView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('vendor:vendor_form_view')
 
     def form_valid(self, form):
-        messages.success(self.request, "Vendor created successfully!")
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        vendor = self.object.vendor_name
+        messages.success(self.request, f"Vendor '{vendor}' created successfully!")
+        return response
 
     def form_invalid(self, form):
         messages.error(self.request, "Please correct the highlighted errors.")
@@ -47,6 +49,11 @@ class VendorUpdateView(LoginRequiredMixin, UpdateView):
     form_class = VendorForm
     success_url = reverse_lazy('vendor:vendor_list_view')
 
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        vendor = self.object.vendor_name
+        messages.success(self.request, f"Vendor '{vendor}' updated successfully!")
+        return response
 
 class VendorDeleteView(LoginRequiredMixin, DeleteView):
     model = Vendor
