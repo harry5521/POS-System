@@ -52,30 +52,61 @@ class Payment(models.Model):
             return f"Vendor Payment - {self.vendor.vendor_name} ({self.amount})"
         return f"Payment #{self.id} - {self.amount}"
 
+
     @transaction.atomic
     def apply_payment(self):
         """
-        Apply payment to related order (purchase or sale).
+        Apply vendor or customer payment to the linked order.
+        Ensures no overpayment and updates order status accordingly.
         """
 
-        amount = self.amount
+        amount = Decimal(self.amount)
+
+        if amount <= 0:
+            raise ValueError("Payment amount must be greater than zero.")
 
         # ────────────── CUSTOMER PAYMENT ──────────────
         if self.payment_type == "customer" and self.sales_order:
             order = self.sales_order
             if order.remaining_amount > 0:
-                amount = min(order.remaining_amount, self.amount)
-                order.remaining_amount = Decimal(order.remaining_amount) - amount
-                order.status = "Paid" if order.remaining_amount <= 0 else "Partial"
-                order.save(update_fields=["remaining_amount", "status"])
+                pass  # continue later for customer logic
 
         # ────────────── VENDOR PAYMENT ──────────────
         elif self.payment_type == "vendor":
             if not self.purchase_order:
                 raise ValueError("Vendor payment must be linked with a Purchase Order.")
-            
+            if not self.vendor:
+                raise ValueError("Vendor payment must be linked with a Vendor.")
             order = self.purchase_order
-            if order.remaining_amount > 0:
-                order.remaining_amount = Decimal(order.remaining_amount) - amount
-                order.status = "Paid" if order.remaining_amount <= 0 else "Partial"
+
+            # Already fully paid
+            if order.status == "Paid":
+                raise ValueError("Purchase Order is already fully paid.")
+
+            # ── First-time payment (unpaid order) ──
+            if order.remaining_amount == 0 and order.status == "unpaid":
+                if amount > order.total_amount:
+                    raise ValueError("Payment amount can't exceed the total amount.")
+
+                if amount == order.total_amount:
+                    order.remaining_amount = 0
+                    order.status = "Paid"
+                else:
+                    order.remaining_amount = Decimal(order.total_amount) - amount
+                    order.status = "Partial"
+
                 order.save(update_fields=["remaining_amount", "status"])
+
+            # ── Subsequent payment (partial order) ──
+            else:
+                if amount > order.remaining_amount:
+                    raise ValueError("Payment amount can't exceed the remaining amount.")
+
+                order.remaining_amount = Decimal(order.remaining_amount) - amount
+                if order.remaining_amount == 0:
+                    order.status = "Paid"
+
+                order.save(update_fields=["remaining_amount", "status"])
+
+        else:
+            raise ValueError("Invalid payment type or missing linked order.")

@@ -11,6 +11,7 @@ from sales.models import SalesOrder
 from purchases.models import PurchaseOrder
 from .forms import PaymentForm
 from django.db.models import Q
+from django.db import transaction
 
 # Create your views here.
 
@@ -114,27 +115,38 @@ class PaymentConfirmView(View):
             messages.error(request, "Session expired. Please record payment again.")
             return redirect("payments:payments_form_view")
 
-        payment = Payment.objects.create(
-            payment_type=data["payment_type"],
-            payment_method=data["payment_method"],
-            customer_id=data["customer_id"],
-            vendor_id=data["vendor_id"],
-            sales_order_id=data["sales_order_id"],
-            purchase_order_id=data["purchase_order_id"],
-            amount=data["amount"],
-            reference_no=data["reference_no"],
-            notes=data["notes"],
-            created_by=request.user,
-        )
+        try:
+            with transaction.atomic():
+                # Create payment record (not committed yet)
+                payment = Payment.objects.create(
+                    payment_type=data.get("payment_type"),
+                    payment_method=data.get("payment_method"),
+                    customer_id=data.get("customer_id"),
+                    vendor_id=data.get("vendor_id"),
+                    sales_order_id=data.get("sales_order_id"),
+                    purchase_order_id=data.get("purchase_order_id"),
+                    amount=data.get("amount"),
+                    reference_no=data.get("reference_no"),
+                    notes=data.get("notes"),
+                    created_by=request.user,
+                )
 
-        # Apply payment balance update
-        payment.apply_payment()
+                # Apply balance logic safely
+                payment.apply_payment()
 
-        # update Purchase
-        
+            # If everything successful, clear session
+            if "pending_payment" in request.session:
+                del request.session["pending_payment"]
 
-        # Clear session
-        del request.session["pending_payment"]
+            messages.success(request, f"✅ Payment of {payment.amount} recorded successfully!")
+            return redirect("payments:payments_list_view")
 
-        messages.success(request, f"Payment of {payment.amount} recorded successfully!")
-        return redirect("payments:payments_list_view")
+        except ValueError as e:
+            # Logical/validation error from apply_payment
+            messages.error(request, f"⚠️ {str(e)}")
+            return redirect("payments:payment_confirm_view")
+
+        except Exception as e:
+            # Any unexpected issue
+            messages.error(request, f"❌ An unexpected error occurred: {str(e)}")
+            return redirect("payments:payment_confirm_view")

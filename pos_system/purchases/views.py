@@ -24,7 +24,8 @@ class PurchaseListView(LoginRequiredMixin, ListView):
             p_orders = p_orders.filter(
                 Q(order_id__icontains=query) |
                 Q(vendor__vendor_name__icontains=query) |
-                Q(invoice_number__icontains=query) 
+                Q(invoice_number__icontains=query) |
+                Q(status__icontains=query)
             )
         return p_orders
 

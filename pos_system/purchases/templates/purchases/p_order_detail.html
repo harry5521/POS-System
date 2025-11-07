@@ -46,8 +46,9 @@
     font-size: 13px;
     color: #fff;
 }
-.status.confirmed { background: #28a745; }
-.status.pending { background: #f0ad4e; }
+.status.paid { background: #ff0000ff; }
+.status.partial { background: #28a745; }
+.status.unpaid { background: #f0ad4e; }
 
 .section-title {
     margin: 15px 0 10px;
@@ -94,12 +95,15 @@
             <p><strong>Vendor:</strong> {{ order.vendor.vendor_name }}</p>
             <p><strong>Purchase Date:</strong> {{ order.purchase_date }}</p>
             <p><strong>Total Amount:</strong> Rs. {{ order.total_amount }}</p>
+            <p><strong>Remaining Amount:</strong> Rs. {{ order.remaining_amount }}</p>
             <p><strong>Notes:</strong> {{ order.notes|default:"—" }}</p>
             <p><strong>Status:</strong>
-                {% if order.is_confirmed %}
-                    <span class="status confirmed">Confirmed</span>
+                {% if order.status == 'Paid' %}
+                    <span class="status paid">Paid</span>
+                {% elif order.status == 'Partial' %}
+                    <span class="status partial">Partially Paid</span>
                 {% else %}
-                    <span class="status pending">Pending</span>
+                    <span class="status unpaid">Unpaid</span>
                 {% endif %}
             </p>
         </div>

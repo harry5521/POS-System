@@ -120,6 +120,16 @@ background: #ffed48ff;
 background: #ff5959ff;
 }
 
+.status {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #fff;
+}
+.status.paid { background: #ff0000ff; }
+.status.partial { background: #28a745; }
+.status.unpaid { background: #f0ad4e; }
+
 .no-products {
 text-align: center;
 padding: 20px;
@@ -214,20 +224,7 @@ align-items: stretch;
 .search-bar input {
 max-width: 100%;
 }
-.status {
-padding: 4px 8px;
-border-radius: 6px;
-font-size: 0.85rem;
-font-weight: 500;
-}
-.status.confirmed {
-background: #c6f6d5;
-color: #276749;
-}
-.status.pending {
-background: #fefcbf;
-color: #744210;
-}
+
 {% endblock %}
 
 {% block content %}
@@ -240,7 +237,7 @@ color: #744210;
         <a href="{% url 'purchases:purchase_order_form_view' %}" class="back-btn">+ Add New Purchase Order</a>
         <form>
             <div>
-                <input type="text" name="p-order-search" placeholder="Search by name or barcode">
+                <input type="text" name="p-order-search" placeholder="Order ID / Vendor / Invoice / Status">
                 <button type="submit">Search</button>
             </div>
         </form>
@@ -287,6 +284,7 @@ color: #744210;
                 <th>Date</th>
                 <th>Total Items</th>
                 <th>Total Amount</th>
+                <th>Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -301,6 +299,15 @@ color: #744210;
                 <td>{{ order.purchase_date|date:"d M Y" }}</td>
                 <td>{{ order.purchase_order_items.count }}</td>
                 <td>{{ order.total_amount }}</td>
+                <td>
+                    {% if order.status == 'Paid' %}
+                    <span class="status paid">Paid</span>
+                    {% elif order.status == 'Partial' %}
+                        <span class="status partial">Partial</span>
+                    {% else %}
+                        <span class="status unpaid">Unpaid</span>
+                    {% endif %}
+                </td>
                 <td>
                     <div class="actions">
                         <a class="action-btn view" title="View" href="{% url 'purchases:p_order_detail_view' order.pk %}">
