@@ -1,4 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
+import json
+from django.http import JsonResponse
+from django.db import transaction
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView, DetailView
@@ -7,7 +10,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.contrib import messages
 from .models import SalesOrder, SalesOrderItem
+from .forms import SalesOrderForm
 from products.models import Product
+from customer.models import Customer
 
 # Create your views here.
 
@@ -28,3 +33,104 @@ class SalesListView(ListView):
                 Q(status__icontains=query)
             )
         return sales
+
+
+class SalesOrderFormView(LoginRequiredMixin, CreateView):
+    model = SalesOrder
+    template_name = 'sales/sales_form.html'
+    form_class = SalesOrderForm
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        order_id = self.object.order_id
+        messages.success(self.request, f"Sales Order with {order_id} has been created.")
+        return response
+    
+    def get_success_url(self):
+        return reverse_lazy("sales:create_sales_order_items", kwargs={'pk': self.object.pk})
+
+class SalesOrderItemsFormView(LoginRequiredMixin, View):
+
+    def get(self, request, *args, **kwargs):
+        order_id = kwargs.get('pk')
+        order = get_object_or_404(SalesOrder, pk=order_id)
+        products = Product.objects.all()
+        print(order_id, order.order_id)
+        return render(request, "sales/sales_items_form.html", {'order':order, 'products':products})
+    
+    def post(self, request, *args, **kwargs):
+        order_id = kwargs.get('pk')
+        order = get_object_or_404(SalesOrder, pk=order_id)
+        product = request.POST.getlist("product[]")
+        quantity = request.POST.getlist("quantity[]")
+
+        print(order_id)
+        print(order.order_id)
+        print(product)
+        print(quantity)
+
+        return redirect("sales:sales_list_view")
+
+    #     valid_items = {}
+    #     for p, qty in zip(product, quantity):
+    #         if not p or not qty:
+    #             continue
+    #         q = int(qty)
+    #         if p in valid_items:
+    #             valid_items[p] += q
+    #         else:
+    #             valid_items[p] = q
+    #     print(valid_items)
+    #     print(order_id)
+
+    #     bulk_items = []
+    #     for p_id, qty in valid_items.items():
+    #         # print(p_id, qty)
+    #         product = Product.objects.get(pk=p_id)
+    #         # print(product.product_name)
+    #         existing_item = SalesOrderItem.objects.filter(purchase=order, product=product).first()
+    #         if existing_item:
+    #             existing_item.quantity += qty
+    #             added_amount = product.purchase_price * qty
+    #             existing_item.line_total += added_amount
+    #             existing_item.save(update_fields=['quantity', 'line_total'])
+    #             order.total_amount += added_amount
+    #         else:    
+    #             bulk_items.append(
+    #                 SalesOrderItem(
+    #                     purchase=order,
+    #                     product=product,
+    #                     quantity=qty,
+    #                     purchase_price=product.purchase_price,
+    #                     line_total=product.purchase_price * qty
+    #                 )
+    #             )
+    #     # print(bulk_items)
+
+    #     if bulk_items:
+    #         SalesOrderItem.objects.bulk_create(bulk_items)
+
+    #     total = sum(item.line_total for item in bulk_items)
+    #     order.total_amount += total
+    #     order.save(update_fields=['total_amount'])
+
+    #     messages.success(request, f"Items Added for Purchase Order {order.order_id}")
+    #     return redirect("purchases:purchase_list_view")
+    
+
+# AJAX view to get product details by barcode
+def product_by_barcode(request):
+    
+    barcode = request.GET.get("barcode", "")
+    print(barcode)
+
+    try:
+        product = Product.objects.get(barcode=barcode)
+        return JsonResponse({
+            "id": product.id,
+            "name": product.product_name,
+            "sale_price": str(product.sale_price),
+            "stock": product.quantity,
+        })
+    except Product.DoesNotExist:
+        return JsonResponse({"error": "Product not found"}, status=404)

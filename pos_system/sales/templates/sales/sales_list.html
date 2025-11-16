@@ -218,7 +218,7 @@ max-width: 100%;
     </div>
 
     <div class="search-bar">
-        <a href="" class="back-btn">+ Add New Sale</a>
+        <a href="{% url 'sales:create_sales_order' %}" class="back-btn">+ Add New Sale</a>
         <form>
             <div>
                 <input type="text" name="sale-search" placeholder="Search by Order-ID / Invoice / Customer / Status">

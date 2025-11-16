@@ -21,7 +21,7 @@ class Customer(models.Model):
         verbose_name_plural = "Customers"
 
     def __str__(self):
-        return f"{self.name} ({self.phone})"
+        return self.name
 
     @property
     def status(self):

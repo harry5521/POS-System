@@ -1,0 +1,373 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Purchase Order Items{% endblock title %}
+
+{% block extra_css %}
+.main-container {
+padding: 30px 100px;
+}
+
+/* Order Info Section */
+.order-info {
+background: #fff;
+margin-top: 20px;
+padding: 20px;
+border-radius: 8px;
+box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.order-info h2 {
+color: #0077b6;
+margin-bottom: 15px;
+font-size: 20px;
+}
+
+.order-meta {
+display: flex;
+gap: 40px;
+flex-wrap: wrap;
+}
+
+.order-meta div {
+background-color: #f2f9ff;
+border: 1px solid #cde6ff;
+padding: 8px 12px;
+border-radius: 5px;
+font-size: 15px;
+}
+
+.barcode-section {
+margin: 20px 0;
+}
+
+#barcode-input {
+width: 250px;
+padding: 8px;
+border: 1px solid #aaa;
+border-radius: 4px;
+}
+
+.items-table {
+width: 100%;
+border-collapse: collapse;
+margin-top: 15px;
+}
+
+.items-table th, .items-table td {
+padding: 8px;
+border-bottom: 1px solid #ddd;
+}
+
+.items-table th {
+background: #f3f3f3;
+text-align: left;
+}
+
+
+.submit-container {
+margin-top: 20px;
+text-align: right;
+}
+
+/* Buttons */
+
+.btn-remove {
+background-color: #dc3545;
+color: #fff;
+border: none;
+padding: 6px 10px;
+border-radius: 4px;
+cursor: pointer;
+}
+
+.btn-remove:hover {
+background-color: #b02a37;
+}
+
+.submit-container {
+text-align: right;
+margin-top: 20px;
+}
+
+.btn-submit {
+background-color: #28a745;
+color: white;
+border: none;
+padding: 10px 20px;
+border-radius: 4px;
+cursor: pointer;
+font-weight: 500;
+}
+
+.btn-submit:hover {
+background-color: #218838;
+}
+
+.back-btn-container {
+text-align: left;
+margin-bottom: 30px;
+}
+.back-btn {
+background: #0284c7;
+border: none;
+color: #fff;
+padding: 6px 15px;
+border-radius: 6px;
+cursor: pointer;
+font-size: 15px;
+text-decoration: none;
+transition: background 0.3s;
+}
+.back-btn:hover {
+background: #0369a1;
+}
+
+/* Main totals wrapper */
+.totals-section {
+    width: 100%;
+    max-width: 350px;            /* push to right side */
+    margin-top: 25px;
+    padding: 20px;
+    background: #f8f8f8;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    font-size: 15px;
+}
+
+/* Each row */
+.totals-section div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+/* Labels */
+.totals-section label {
+    font-weight: bold;
+}
+
+/* Inputs inside totals section */
+.totals-section input[type="number"] {
+    width: 140px;
+    padding: 6px 8px;
+    font-size: 15px;
+    border: 1px solid #cfcfcf;
+    border-radius: 6px;
+    text-align: right;
+    background: #fff;
+}
+
+/* Readonly fields */
+.totals-section input[readonly] {
+    background: #e9e9e9;
+    font-weight: bold;
+}
+
+
+
+{% endblock extra_css %}
+
+{% block content %}
+
+<div class="main-container">
+
+    <div class="back-btn-container">
+        <a href="{% url 'sales:sales_list_view' %}" class="back-btn">
+            << Back</a>
+    </div>
+
+    <!-- ORDER INFO -->
+    <div class="order-info">
+        <h2>Sale Order Items</h2>
+        <div class="order-meta">
+            <div><strong>Order ID:</strong> <span>{{ order.order_id }}</span></div>
+            <div><strong>Customer:</strong> <span>{{ order.customer }}</span></div>
+            <div><strong>Notes:</strong> <span>{{ order.notes }}</span></div>
+        </div>
+    </div>
+
+    <!-- BARCODE INPUT -->
+    <div class="barcode-section">
+        <label for="barcode-input"><strong>Scan Barcode:</strong></label>
+        <input type="text" id="barcode-input" placeholder="Scan barcode here..." autofocus>
+    </div>
+
+    <!-- ITEMS TABLE -->
+    <div class="items-section">
+        <h2>Scanned Items</h2>
+
+        <form method="post" id="itemsForm">
+            {% csrf_token %}
+            <input type="hidden" name="order_id" value="{{ order.id }}">
+
+            <table class="items-table" id="itemsTable">
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Product</th>
+                        <th>Sale Price</th>
+                        <th>Stock</th>
+                        <th>Quantity</th>
+                        <th>Line Total</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="itemRows">
+                    <!-- JS will add rows here -->
+                </tbody>
+            </table>
+
+            <!-- TOTALS AREA -->
+            <div class="totals-section">
+                <div>
+                    <label><strong>Total:</strong></label>
+                    <input type="number" id="grand-total" value="0" readonly>
+                </div>
+
+                <div>
+                    <label><strong>Discount:</strong></label>
+                    <input type="number" id="discount" value="0">
+                </div>
+
+                <div>
+                    <label><strong>Final Amount:</strong></label>
+                    <input type="number" id="final-total" value="0" readonly>
+                </div>
+            </div>
+
+
+            <div class="submit-container">
+                <button type="submit" class="btn-submit">Save Items</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+{% endblock content %}
+
+
+{% block extra_js %}
+
+document.addEventListener("DOMContentLoaded", function() {
+
+    const barcodeInput = document.getElementById("barcode-input");
+    const tbody = document.getElementById("itemRows");
+
+    const grandTotalInput = document.getElementById("grand-total");
+    const discountInput = document.getElementById("discount");
+    const finalTotalInput = document.getElementById("final-total");
+
+    // Update numbering
+    function updateSerialNumbers() {
+        const rows = tbody.querySelectorAll("tr");
+        rows.forEach((row, index) => {
+            row.querySelector(".serial").textContent = index + 1;
+        });
+    }
+
+    // Calculate a single row line total
+    function updateLineTotal(row) {
+        const price = parseFloat(row.querySelector(".sale-price").textContent) || 0;
+        const qty = parseFloat(row.querySelector(".qty-input").value) || 0;
+
+        const lineTotal = (price * qty).toFixed(2);
+        row.querySelector(".line-total").textContent = lineTotal;
+
+        updateGrandTotal();
+    }
+
+    // Sum all line totals
+    function updateGrandTotal() {
+        let total = 0;
+
+        tbody.querySelectorAll(".line-total").forEach(span => {
+            total += parseFloat(span.textContent) || 0;
+        });
+
+        grandTotalInput.value = total.toFixed(2);
+        updateFinalAmount();
+    }
+
+    // Final amount = total - discount
+    function updateFinalAmount() {
+        const total = parseFloat(grandTotalInput.value) || 0;
+        const discount = parseFloat(discountInput.value) || 0;
+        finalTotalInput.value = (total - discount).toFixed(2);
+    }
+
+    discountInput.addEventListener("input", updateFinalAmount);
+
+    // Add row to table
+    function addRow(productData) {
+
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td class="serial"></td>
+            <td>${productData.name}</td>
+
+            <td class="sale-price">${productData.sale_price}</td>
+
+            <td>${productData.stock}</td>
+
+            <td>
+                <input type="number" name="quantity[]" min="1" value="1" class="qty-input">
+                <input type="hidden" name="product[]" value="${productData.id}">
+            </td>
+
+            <td>
+                <span class="line-total">0</span>
+            </td>
+
+            <td><button type="button" class="btn-remove">🗑</button></td>
+        `;
+
+        tbody.appendChild(row);
+        updateSerialNumbers();
+        updateLineTotal(row);  // calculate initial line total
+
+        // Update line total when quantity changes
+        row.querySelector(".qty-input").addEventListener("input", () => {
+            updateLineTotal(row);
+        });
+    }
+
+    // Listen barcode
+    barcodeInput.addEventListener("keydown", function(e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+
+            const barcode = barcodeInput.value.trim();
+            if (!barcode) return;
+
+            // AJAX fetch
+            fetch(`/sales/api/product-by-barcode/?barcode=${encodeURIComponent(barcode)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                        return;
+                    }
+                    addRow(data);
+                })
+                .catch(err => console.error(err));
+
+            barcodeInput.value = ""; // clear for next scan
+        }
+    });
+
+    // Delete row
+    tbody.addEventListener("click", function(e) {
+        if (e.target.classList.contains("btn-remove")) {
+            e.target.closest("tr").remove();
+            updateSerialNumbers();
+            updateGrandTotal();
+        }
+    });
+
+});
+
+
+{% endblock extra_js %}
