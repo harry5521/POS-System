@@ -164,6 +164,12 @@ background: #0369a1;
     font-weight: bold;
 }
 
+.qty-warning {
+    color: red;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
 
 
 {% endblock extra_css %}
@@ -222,23 +228,23 @@ background: #0369a1;
             <div class="totals-section">
                 <div>
                     <label><strong>Total:</strong></label>
-                    <input type="number" id="grand-total" value="0" readonly>
+                    <input type="number" name="grand_total" id="grand-total" value="0" readonly>
                 </div>
 
                 <div>
                     <label><strong>Discount:</strong></label>
-                    <input type="number" id="discount" value="0">
+                    <input type="number" name="discount" id="discount" value="0">
                 </div>
 
                 <div>
                     <label><strong>Final Amount:</strong></label>
-                    <input type="number" id="final-total" value="0" readonly>
+                    <input type="number" name="final_total" id="final-total" value="0" readonly>
                 </div>
             </div>
 
 
             <div class="submit-container">
-                <button type="submit" class="btn-submit">Save Items</button>
+                <button type="submit" class="btn-submit" id="save-items-btn">Save Items</button>
             </div>
         </form>
     </div>
@@ -313,7 +319,7 @@ document.addEventListener("DOMContentLoaded", function() {
             <td>${productData.stock}</td>
 
             <td>
-                <input type="number" name="quantity[]" min="1" value="1" class="qty-input">
+                <input type="number" name="quantity[]" min="1" value="1" class="qty-input" data-stock="${productData.stock}"">
                 <input type="hidden" name="product[]" value="${productData.id}">
             </td>
 
@@ -329,8 +335,9 @@ document.addEventListener("DOMContentLoaded", function() {
         updateLineTotal(row);  // calculate initial line total
 
         // Update line total when quantity changes
-        row.querySelector(".qty-input").addEventListener("input", () => {
+        row.querySelector(".qty-input").addEventListener("input", (e) => {
             updateLineTotal(row);
+            validateQuantity(e.target);
         });
     }
 
@@ -367,7 +374,46 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
+
+function updateSaveButtonState() {
+    const saveBtn = document.getElementById("save-items-btn");
+    const warnings = tbody.querySelectorAll(".qty-warning");
+
+    if (warnings.length > 0) {
+        saveBtn.disabled = true;
+        saveBtn.style.opacity = 0.5;
+        saveBtn.style.cursor = "not-allowed";
+    } else {
+        saveBtn.disabled = false;
+        saveBtn.style.opacity = 1;
+        saveBtn.style.cursor = "pointer";
+    }
+}
+
+
+function validateQuantity(input) {
+    const stock = parseInt(input.dataset.stock || 0);
+    const qty = parseInt(input.value || 0);
+
+    let warning = input.parentNode.querySelector(".qty-warning");
+
+    if (qty > stock) {
+        if (!warning) {
+            const span = document.createElement("span");
+            span.classList.add("qty-warning");
+            span.textContent = "⚠";
+            input.parentNode.appendChild(span);
+        }
+    } else {
+        if (warning) warning.remove();
+    }
+
+    updateSaveButtonState(); 
+}
+
+
 });
+
 
 
 {% endblock extra_js %}

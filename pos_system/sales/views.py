@@ -63,11 +63,18 @@ class SalesOrderItemsFormView(LoginRequiredMixin, View):
         order = get_object_or_404(SalesOrder, pk=order_id)
         product = request.POST.getlist("product[]")
         quantity = request.POST.getlist("quantity[]")
+        gand_total = request.POST.get("grand_total")
+        discount = request.POST.get("discount")
+        final_total = request.POST.get("final_total")
 
         print(order_id)
         print(order.order_id)
         print(product)
         print(quantity)
+        print(gand_total)
+        print(discount)
+        print(final_total)
+
 
         return redirect("sales:sales_list_view")
 

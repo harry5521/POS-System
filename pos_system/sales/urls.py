@@ -6,7 +6,7 @@ app_name = 'sales'
 
 urlpatterns = [
     path('', views.SalesListView.as_view(), name="sales_list_view"),
-    path('create-order/', views.SalesOrderFormView.as_view(), name='create_sales_order'),
+    path('create-sale-order/', views.SalesOrderFormView.as_view(), name='create_sales_order'),
     path('sales-items/<int:pk>/', views.SalesOrderItemsFormView.as_view(), name='create_sales_order_items'),
 
     # API Endpoints

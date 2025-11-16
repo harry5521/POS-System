@@ -46,7 +46,7 @@ class SalesOrder(models.Model):
     discount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
-    paid_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    remaining_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="unpaid")
     payment_method = models.CharField(max_length=20, default="Cash")  # Cash / Card / Credit
     notes = models.TextField(blank=True, null=True)
