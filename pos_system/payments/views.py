@@ -37,7 +37,8 @@ class PaymentListView(ListView):
             payments = payments.filter(
                 Q(customer__name__icontains=query) |
                 Q(vendor__vendor_name__icontains=query) |
-                Q(reference_no__icontains=query)
+                Q(reference_no__icontains=query) |
+                Q(created_by__username__icontains=query)
             )
         return payments
     
@@ -48,6 +49,20 @@ class PaymentFormView(View):
     def get(self, request):
         clear_pending_payment(request)
         form = PaymentForm()
+
+        sale_order = request.GET.get("sale_order")
+        customer = request.GET.get("customer")
+
+        print(customer)
+
+        initial = {}
+
+        if sale_order and customer:
+            initial["payment_type"] = "customer"
+            initial["customer"] = customer
+            initial["sales_order"] = sale_order
+
+        form = PaymentForm(initial=initial)
         return render(request, self.template_name, {"form": form})
 
     def post(self, request):
@@ -69,7 +84,7 @@ class PaymentFormView(View):
             }
 
             request.session["pending_payment"] = session_data
-            print(request.session["pending_payment"])
+            # print(request.session["pending_payment"])
             return redirect("payments:payment_confirm_view")
 
         messages.error(request, "Please correct the highlighted errors.")
@@ -91,22 +106,27 @@ class PaymentConfirmView(View):
     def get(self, request):
         data = request.session.get("pending_payment")
         if not data:
-            messages.error(request, "No payment data found. Please record payment again.")
+            messages.error(request, "No payment data found.")
             return redirect("payments:add_payment")
 
         context = {"data": data}
 
-        # Fetch related objects for display
         if data["payment_type"] == "customer":
-            context["customer"] = Customer.objects.filter(id=data["customer_id"]).first()
-            context["sales_order"] = SalesOrder.objects.filter(id=data["sales_order_id"]).first()
-        elif data["payment_type"] == "vendor":
-            context["vendor"] = Vendor.objects.filter(id=data["vendor_id"]).first()
-            context["purchase_order"] = PurchaseOrder.objects.filter(id=data["purchase_order_id"]).first()
-            
+            customer = Customer.objects.filter(id=data["customer_id"]).first()
+            sales_order = SalesOrder.objects.filter(id=data["sales_order_id"]).first()
 
-        print(context)
+            context["party"] = customer            # customer/vendor unified
+            context["order"] = sales_order         # unified order object
+
+        elif data["payment_type"] == "vendor":
+            vendor = Vendor.objects.filter(id=data["vendor_id"]).first()
+            purchase_order = PurchaseOrder.objects.filter(id=data["purchase_order_id"]).first()
+
+            context["party"] = vendor              # customer/vendor unified
+            context["order"] = purchase_order      # unified order object
+
         return render(request, self.template_name, context)
+
 
     def post(self, request):
         """When user confirms the payment"""

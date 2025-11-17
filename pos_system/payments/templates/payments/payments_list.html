@@ -240,7 +240,7 @@ color: #744210;
         <a href="{% url 'payments:payment_form_view' %}" class="back-btn">+ Add New Payment</a>
         <form>
             <div>
-                <input type="text" name="payment-search" placeholder="Search by name or barcode">
+                <input type="text" name="payment-search" placeholder="Search by Customer / Vendor / Ref No / Cashier">
                 <button type="submit">Search</button>
             </div>
         </form>
@@ -287,7 +287,6 @@ color: #744210;
                 <th>Amount</th>
                 <th>Created by</th>
                 <th>Created at</th>
-                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -295,22 +294,13 @@ color: #744210;
             {% for payment in payments %}
             <tr>
                 <td>{{ forloop.counter }}</td>
-                <td>{{ payment.customer.name }}</td>
-                <td>{{ payment.vendor.vendor_name }}</td>
+                <td>{{ payment.customer.name|default:"-----" }}</td>
+                <td>{{ payment.vendor.vendor_name|default:"-----" }}</td>
                 <td>{{ payment.reference_no }}</td>
                 <td>{{ payment.amount }}</td>
                 <td>{{ payment.created_by }}</td>
-                <td>{{ payment.created_at|date:"d M Y" }}</td>
-                <td>
-                    <div class="actions">
-                        <a class="action-btn view" title="View" href="">
-                            🔍
-                        </a>
-                        <a class="action-btn add" title="Add Items" href="">
-                            ➕
-                        </a>
-                    </div>
-                </td>
+                <td>{{ payment.payment_date|date:"d M Y" }}</td>
+                
             </tr>
             {% endfor %}
             {% else %}

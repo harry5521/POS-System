@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 import json
 from django.http import JsonResponse
 from django.db import transaction
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views import View
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
@@ -55,7 +55,6 @@ class SalesOrderItemsFormView(LoginRequiredMixin, View):
         order_id = kwargs.get('pk')
         order = get_object_or_404(SalesOrder, pk=order_id)
         products = Product.objects.all()
-        print(order_id, order.order_id)
         return render(request, "sales/sales_items_form.html", {'order':order, 'products':products})
     
     def post(self, request, *args, **kwargs):
@@ -67,63 +66,74 @@ class SalesOrderItemsFormView(LoginRequiredMixin, View):
         discount = request.POST.get("discount")
         final_total = request.POST.get("final_total")
 
-        print(order_id)
-        print(order.order_id)
-        print(product)
-        print(quantity)
-        print(gand_total)
-        print(discount)
-        print(final_total)
+        # print(order_id)
+        # print(order.order_id)
+        # print(product)
+        # print(quantity)
+        # print(gand_total)
+        # print(discount)
+        # print(final_total)
+
+        valid_items = {}
+        for p, qty in zip(product, quantity):
+            if not p or not qty:
+                continue
+            q = int(qty)
+            if p in valid_items:
+                valid_items[p] += q
+            else:
+                valid_items[p] = q
+        print(valid_items)
 
 
-        return redirect("sales:sales_list_view")
+        bulk_items = []
+        for p_id, qty in valid_items.items():
+            print(p_id, qty)
+            product = Product.objects.get(pk=p_id)
+            
+            bulk_items.append(
+                SalesOrderItem(
+                    sales_order=order,
+                    product=product,
+                    quantity=qty,
+                    sale_price=product.sale_price,
+                    line_total=product.sale_price * qty
+                    )
+            )
 
-    #     valid_items = {}
-    #     for p, qty in zip(product, quantity):
-    #         if not p or not qty:
-    #             continue
-    #         q = int(qty)
-    #         if p in valid_items:
-    #             valid_items[p] += q
-    #         else:
-    #             valid_items[p] = q
-    #     print(valid_items)
-    #     print(order_id)
+        for pr, qty in valid_items.items():
+            if not pr or not qty:
+                continue
+            product = Product.objects.get(pk=pr)
+            product.quantity -= qty
+            product.save(update_fields=['quantity'])
 
-    #     bulk_items = []
-    #     for p_id, qty in valid_items.items():
-    #         # print(p_id, qty)
-    #         product = Product.objects.get(pk=p_id)
-    #         # print(product.product_name)
-    #         existing_item = SalesOrderItem.objects.filter(purchase=order, product=product).first()
-    #         if existing_item:
-    #             existing_item.quantity += qty
-    #             added_amount = product.purchase_price * qty
-    #             existing_item.line_total += added_amount
-    #             existing_item.save(update_fields=['quantity', 'line_total'])
-    #             order.total_amount += added_amount
-    #         else:    
-    #             bulk_items.append(
-    #                 SalesOrderItem(
-    #                     purchase=order,
-    #                     product=product,
-    #                     quantity=qty,
-    #                     purchase_price=product.purchase_price,
-    #                     line_total=product.purchase_price * qty
-    #                 )
-    #             )
-    #     # print(bulk_items)
+        if bulk_items:
+            SalesOrderItem.objects.bulk_create(bulk_items)
 
-    #     if bulk_items:
-    #         SalesOrderItem.objects.bulk_create(bulk_items)
+        total = sum(item.line_total for item in bulk_items)
+        order.subtotal += total
+        order.discount = discount
+        order.total_amount = final_total
+        order.save(update_fields=['subtotal', 'discount', 'total_amount'])
+        messages.success(request, f"Items Added for Sales Order {order.order_id}")
 
-    #     total = sum(item.line_total for item in bulk_items)
-    #     order.total_amount += total
-    #     order.save(update_fields=['total_amount'])
+        url = reverse("payments:payment_form_view")
+        query = f"?sale_order={order_id}&customer={order.customer.id}"
+        return redirect(url + query)
 
-    #     messages.success(request, f"Items Added for Purchase Order {order.order_id}")
-    #     return redirect("purchases:purchase_list_view")
-    
+
+
+class SalesOrderDetailView(LoginRequiredMixin, DetailView):
+    model = SalesOrder
+    template_name = 'sales/sales_details.html'
+    context_object_name = 'order'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["items"] = self.object.sales_items.select_related("product")
+        return context
+
 
 # AJAX view to get product details by barcode
 def product_by_barcode(request):

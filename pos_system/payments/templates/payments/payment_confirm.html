@@ -163,9 +163,9 @@
     </div>
     {% endif %}
 
-
     <div class="summary-card">
       <div class="summary-grid">
+
         <div class="summary-item">
           <label>Payment Type:</label>
           <span>{{ data.payment_type|title }}</span>
@@ -176,46 +176,48 @@
           <span>{{ data.payment_method|title }}</span>
         </div>
 
-        {% if data.payment_type == 'customer' and order %}
+        {% if data.payment_type == 'customer' %}
         <div class="summary-item">
           <label>Customer:</label>
-          <span>{{ order.customer.name }}</span>
+          <span>{{ party.name }}</span>
         </div>
 
         <div class="summary-item">
-          <label>Sales Order:</label>
+          <label>Sales Order Invoice:</label>
           <span>{{ order.invoice_number }}</span>
         </div>
-        {% elif data.payment_type == 'vendor' and order %}
+
+        {% elif data.payment_type == 'vendor' %}
         <div class="summary-item">
           <label>Vendor:</label>
-          <span>{{ order.vendor.vendor_name }}</span>
+          <span>{{ party.vendor_name }}</span>
         </div>
 
         <div class="summary-item">
-          <label>Purchase Order:</label>
+          <label>Purchase Order Invoice:</label>
           <span>{{ order.invoice_number }}</span>
         </div>
         {% endif %}
 
+        <!-- COMMON FIELDS FOR BOTH -->
         <div class="summary-item">
-          <label>#Invoice:</label>
-          <span>{{ purchase_order.invoice_number }}</span>
+          <label>Cashier:</label>
+          <span>{{ order.created_by }}</span>
         </div>
 
         <div class="summary-item">
           <label>Bill Status:</label>
-          <span>{{ purchase_order.status }}</span>
+          <span>{{ order.status }}</span>
         </div>
 
         <div class="summary-item">
           <label>Total Bill:</label>
-          <span>{{ purchase_order.total_amount }}</span>
+          <span>{{ order.total_amount }}</span>
         </div>
 
         <div class="summary-item">
           <label>Remaining Bill:</label>
-          <span>{{ purchase_order.remaining_amount }}</span>
+          <span>{{ order.remaining_amount }}</span>
         </div>
 
         <div class="summary-item">
@@ -227,7 +229,6 @@
           <label>Reference No:</label>
           <span>{{ data.reference_no|default:"—" }}</span>
         </div>
-
 
       </div>
 
@@ -244,6 +245,8 @@
         </div>
       </form>
     </div>
+
+
   </div>
 
 

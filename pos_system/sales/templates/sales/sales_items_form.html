@@ -319,7 +319,7 @@ document.addEventListener("DOMContentLoaded", function() {
             <td>${productData.stock}</td>
 
             <td>
-                <input type="number" name="quantity[]" min="1" value="1" class="qty-input" data-stock="${productData.stock}"">
+                <input type="number" name="quantity[]" min="1" value="1" class="qty-input" data-stock="${productData.stock}" required>
                 <input type="hidden" name="product[]" value="${productData.id}">
             </td>
 
@@ -397,7 +397,7 @@ function validateQuantity(input) {
 
     let warning = input.parentNode.querySelector(".qty-warning");
 
-    if (qty > stock) {
+    if (qty > stock || qty <= 0) {
         if (!warning) {
             const span = document.createElement("span");
             span.classList.add("qty-warning");

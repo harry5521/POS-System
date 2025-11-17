@@ -66,10 +66,42 @@ class Payment(models.Model):
             raise ValueError("Payment amount must be greater than zero.")
 
         # ────────────── CUSTOMER PAYMENT ──────────────
-        if self.payment_type == "customer" and self.sales_order:
+        if self.payment_type == "customer":
+            if not self.sales_order:
+                raise ValueError("Customer payment must be linked with a Sales Order.")
+            if not self.customer:
+                raise ValueError("Customer payment must be linked with a Customer.")
             order = self.sales_order
-            if order.remaining_amount > 0:
-                pass  # continue later for customer logic
+
+            # Already fully paid
+            if order.status == "Paid":
+                raise ValueError("Sales Order is already fully paid.")
+
+            # ── First-time payment (unpaid order) ──
+            if order.remaining_amount == 0 and order.status == "unpaid":
+                if amount > order.total_amount:
+                    raise ValueError("Payment amount can't exceed the total amount.")
+
+                if amount == order.total_amount:
+                    order.remaining_amount = 0
+                    order.status = "Paid"
+                else:
+                    order.remaining_amount = Decimal(order.total_amount) - amount
+                    order.status = "Partial"
+
+                order.save(update_fields=["remaining_amount", "status"])
+
+            # ── Subsequent payment (partial order) ──
+            else:
+                if amount > order.remaining_amount:
+                    raise ValueError("Payment amount can't exceed the remaining amount.")
+
+                order.remaining_amount = Decimal(order.remaining_amount) - amount
+                if order.remaining_amount == 0:
+                    order.status = "Paid"
+
+                order.save(update_fields=["remaining_amount", "status"])
+
 
         # ────────────── VENDOR PAYMENT ──────────────
         elif self.payment_type == "vendor":

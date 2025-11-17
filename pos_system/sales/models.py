@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from products.models import Product
 from customer.models import Customer
+from django.contrib.auth.models import User
 import string, random
 
 # Create your models here.
@@ -52,6 +53,7 @@ class SalesOrder(models.Model):
     notes = models.TextField(blank=True, null=True)
 
     created_at = models.DateTimeField(default=timezone.now)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="created_sales_order")
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -60,7 +62,7 @@ class SalesOrder(models.Model):
         verbose_name_plural = "Sales Orders"
 
     def __str__(self):
-        return f"Order #{self.order_id}"
+        return f"Sales #{self.invoice_number} - {self.customer.name}"
 
     @property
     def due_amount(self):

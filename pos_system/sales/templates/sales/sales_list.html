@@ -106,13 +106,23 @@ font-size: 16px;
 text-decoration: none;
 }
 
-.edit {
-background: #ffed48ff;
+.view {
+background: #00e9faff;
 }
 
 .delete {
 background: #ff5959ff;
 }
+
+.status {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #fff;
+}
+.status.paid { background: #ff0000ff; }
+.status.partial { background: #28a745; }
+.status.unpaid { background: #f0ad4e; }
 
 .no-products {
 text-align: center;
@@ -234,9 +244,10 @@ max-width: 100%;
                 <th>Sale-ID</th>
                 <th>Customer</th>
                 <th>Invoice-No</th>
-                <th>Status</th>
+                <th>Date</th>
+                <th>Total Items</th>
                 <th>Total Amount</th>
-                <th>Created</th>
+                <th>Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -248,14 +259,22 @@ max-width: 100%;
                 <td>{{ sale.order_id }}</td>
                 <td>{{ sale.customer.name }}</td>
                 <td>{{ sale.invoice_number }}</td>
-                <td>{{ sale.status }}</td>
+                <td>{{ sale.created_at|date:"d M Y" }}</td>
+                <td>{{ sale.sales_items.count }}</td>
                 <td>{{ sale.total_amount }}</td>
-                <td>{{ sale.created_at }}</td>
+                <td>
+                    {% if sale.status == 'Paid' %}
+                    <span class="status paid">Paid</span>
+                    {% elif sale.status == 'Partial' %}
+                        <span class="status partial">Partial</span>
+                    {% else %}
+                        <span class="status unpaid">Unpaid</span>
+                    {% endif %}
+                </td>
                 <td>
                     <div class="actions">
-                        <a class="action-btn edit" title="Edit"
-                            href="{">
-                            ✏️
+                        <a class="action-btn view" title="Edit" href="{% url 'sales:sales_detail_view' sale.pk %}">
+                            🔍
                         </a>
                         <!-- Delete icon link -->
                         <a href="#delete-{{ sale.pk }}" class="action-btn delete">🗑️</a>

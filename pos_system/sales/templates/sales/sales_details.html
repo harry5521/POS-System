@@ -1,0 +1,141 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Purchase Order Items View{% endblock title %}
+
+{% block extra_css %}
+
+.main-container {
+    padding: 30px 50px;
+}
+
+.header-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.btn-back {
+    background: #0284c7;
+    color: #fff;
+    padding: 6px 12px;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: 0.2s;
+}
+.btn-back:hover {
+    background: #0369a1;
+}
+
+.order-info-box {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin-bottom: 25px;
+}
+
+.order-meta p {
+    margin: 6px 0;
+    font-size: 15px;
+}
+
+.status {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #fff;
+}
+.status.paid { background: #ff0000ff; }
+.status.partial { background: #28a745; }
+.status.unpaid { background: #f0ad4e; }
+
+.section-title {
+    margin: 15px 0 10px;
+    font-size: 18px;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+}
+.data-table th, .data-table td {
+    border: 1px solid #ddd;
+    padding: 8px 10px;
+    text-align: left;
+}
+.data-table th {
+    background: #efefef;
+    font-weight: bold;
+}
+.no-data {
+    text-align: center;
+    color: #777;
+    padding: 15px 0;
+}
+
+{% endblock extra_css %}
+
+
+{% block content %}
+
+<div class="main-container">
+
+
+    <a href="{% url 'sales:sales_list_view' %}" class="btn-back"><< Back</a>
+    <div class="header-bar">
+        <h2>Sales Order Details</h2>
+    </div>
+
+    <div class="order-info-box">
+        <div class="order-meta">
+            <p><strong>Order ID:</strong> {{ order.order_id }}</p>
+            <p><strong>Invoice Number:</strong> {{ order.invoice_number }}</p>
+            <p><strong>Customer:</strong> {{ order.customer.name }}</p>
+            <p><strong>Sales Date:</strong> {{ order.sale_date }}</p>
+            <p><strong>Grand Total:</strong> Rs. {{ order.subtotal }}</p>
+            <p><strong>Discount:</strong> Rs. {{ order.discount }}</p>
+            <p><strong>Final Total:</strong> Rs. {{ order.total_amount }}</p>
+            <p><strong>Remaining Amount:</strong> Rs. {{ order.remaining_amount }}</p>
+            <p><strong>Notes:</strong> {{ order.notes|default:"—" }}</p>
+            <p><strong>Status:</strong>
+                {% if order.status == 'Paid' %}
+                    <span class="status paid">Paid</span>
+                {% elif order.status == 'Partial' %}
+                    <span class="status partial">Partially Paid</span>
+                {% else %}
+                    <span class="status unpaid">Unpaid</span>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <h3 class="section-title">Purchased Items</h3>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Product</th>
+                <th>Sale Price</th>
+                <th>Quantity</th>
+                <th>Line Total</th>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ item.product.product_name }}</td>
+                <td>Rs. {{ item.sale_price }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>Rs. {{ item.line_total }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="no-data">No items found for this order.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+{% endblock content %}
