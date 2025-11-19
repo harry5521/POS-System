@@ -37,6 +37,7 @@ class PurchaseOrderFormView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy("purchases:purchase_list_view")
 
     def form_valid(self, form):
+        form.instance.created_by = self.request.user
         response = super().form_valid(form)
         order_id = self.object.order_id
         messages.success(self.request, f"Purchase Order with {order_id} has been created.")

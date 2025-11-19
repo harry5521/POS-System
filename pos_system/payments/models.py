@@ -72,7 +72,7 @@ class Payment(models.Model):
             if not self.customer:
                 raise ValueError("Customer payment must be linked with a Customer.")
             order = self.sales_order
-
+            
             # Already fully paid
             if order.status == "Paid":
                 raise ValueError("Sales Order is already fully paid.")
@@ -83,25 +83,35 @@ class Payment(models.Model):
                     raise ValueError("Payment amount can't exceed the total amount.")
 
                 if amount == order.total_amount:
+                    order.paid_amount = amount
                     order.remaining_amount = 0
                     order.status = "Paid"
+                    order.customer.current_balance -= amount
                 else:
+                    if order.customer.name in ["Walk-in-Customer", "Walk-In-Customer", "Customer"]:
+                        raise ValueError("Walk-in-Customer can't has Partial Payment.")
+                    order.paid_amount += amount
                     order.remaining_amount = Decimal(order.total_amount) - amount
                     order.status = "Partial"
+                    order.customer.current_balance -= amount
 
-                order.save(update_fields=["remaining_amount", "status"])
+                order.save(update_fields=["paid_amount", "remaining_amount", "status"])
+                order.customer.save(update_fields=["current_balance"])
 
             # ── Subsequent payment (partial order) ──
             else:
                 if amount > order.remaining_amount:
                     raise ValueError("Payment amount can't exceed the remaining amount.")
 
+                order.paid_amount += amount
                 order.remaining_amount = Decimal(order.remaining_amount) - amount
                 if order.remaining_amount == 0:
                     order.status = "Paid"
+                order.customer.current_balance -= amount
 
-                order.save(update_fields=["remaining_amount", "status"])
-
+                order.save(update_fields=["paid_amount", "remaining_amount", "status"])
+                order.customer.save(update_fields=["current_balance"])
+                
 
         # ────────────── VENDOR PAYMENT ──────────────
         elif self.payment_type == "vendor":

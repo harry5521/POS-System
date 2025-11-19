@@ -281,8 +281,8 @@ color: #744210;
         <thead>
             <tr>
                 <th>#</th>
-                <th>Customer</th>
-                <th>Vendor</th>
+                <th>Customer/Vendor</th>
+                <th>Sales/Purchase</th>
                 <th>Reference Number</th>
                 <th>Amount</th>
                 <th>Created by</th>
@@ -294,8 +294,8 @@ color: #744210;
             {% for payment in payments %}
             <tr>
                 <td>{{ forloop.counter }}</td>
-                <td>{{ payment.customer.name|default:"-----" }}</td>
-                <td>{{ payment.vendor.vendor_name|default:"-----" }}</td>
+                <td> {% if payment.customer.name %} {{ payment.customer.name }} {% else %} {{ payment.vendor.vendor_name }} {% endif %}</td>
+                <td> {% if payment.sales_order %} {{ payment.sales_order.order_id }} {% else %} {{ payment.purchase_order.order_id }} {% endif %}</td>
                 <td>{{ payment.reference_no }}</td>
                 <td>{{ payment.amount }}</td>
                 <td>{{ payment.created_by }}</td>

@@ -41,6 +41,7 @@ class SalesOrderFormView(LoginRequiredMixin, CreateView):
     form_class = SalesOrderForm
 
     def form_valid(self, form):
+        form.instance.created_by = self.request.user
         response = super().form_valid(form)
         order_id = self.object.order_id
         messages.success(self.request, f"Sales Order with {order_id} has been created.")
@@ -116,6 +117,7 @@ class SalesOrderItemsFormView(LoginRequiredMixin, View):
         order.discount = discount
         order.total_amount = final_total
         order.save(update_fields=['subtotal', 'discount', 'total_amount'])
+        order.update_customer_balance()
         messages.success(request, f"Items Added for Sales Order {order.order_id}")
 
         url = reverse("payments:payment_form_view")

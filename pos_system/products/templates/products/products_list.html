@@ -43,13 +43,7 @@ gap: 10px;
 margin-bottom: 20px;
 }
 
-.search-bar div{
-display: flex;
-align-items: center;
-justify-content: end;
-gap: 3px;
-width: 500px;
-}
+
 .search-bar input {
 flex: 1;
 max-width: 300px;
@@ -58,7 +52,7 @@ border: 1px solid #ccc;
 border-radius: 6px;
 }
 
-.search-bar button {
+.search-bar button, .search-bar a{
 background: #0284c7;
 border: none;
 color: #fff;
@@ -138,6 +132,78 @@ animation: fadeIn 0.3s ease-in-out;
 display: flex;
 }
 
+/* Modal for Category */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+/* Hide class */
+.hidden {
+    display: none;
+}
+
+/* Modal Box */
+.modal-content {
+    background: #fff;
+    padding: 20px 25px;
+    width: 300px;
+    border-radius: 8px;
+    position: relative;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+
+/* Close Button (X) */
+.close-btn {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+/* Form fields */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.form-group input {
+    padding: 8px;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+/* Save button */
+.save-btn {
+    width: 100%;
+    border: none;
+    background: #1d9d50;
+    padding: 10px;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.save-btn:hover {
+    background: #15803d;
+}
+
+
 /* Modal box */
 .modal-content {
 background: #fff;
@@ -196,19 +262,12 @@ to { transform: scale(1); opacity: 1; }
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 768px) 
 .product-table th, .product-table td {
 padding: 8px;
 font-size: 14px;
 }
-.search-bar {
-flex-direction: column;
-align-items: stretch;
-}
-.search-bar input {
-max-width: 100%;
-}
-}
+
 {% endblock %}
 
 {% block content %}
@@ -218,10 +277,13 @@ max-width: 100%;
     </div>
 
     <div class="search-bar">
-        <a href="{% url 'products:product_form_view' %}" class="back-btn">+ Add New Product</a>
+        <div>
+            <a href="{% url 'products:product_form_view' %}" class="back-btn">+ Add New Product</a>
+            <button id="openCategoryModalBtn" class="back-btn">Add Category</button>
+        </div>
         <form>
             <div>
-                <input type="text" name="product-search" placeholder="Search by name or barcode">
+                <input type="text" name="product-search" style="width: 400px;" placeholder="Search by Product / Barcode / Vendor">
                 <button type="submit">Search</button>
             </div>
         </form>
@@ -280,7 +342,7 @@ max-width: 100%;
                 <td>{{ product.product_name }}</td>
                 <td>{{ product.barcode }}</td>
                 <td>{{ product.vendor }}</td>
-                <td>{{ product.category }}</td>
+                <td>{{ product.category.cat_name|default:"-----" }}</td>
                 <td>{{ product.purchase_price }}</td>
                 <td>{{ product.sale_price }}</td>
                 <td>{{ product.quantity }}</td>
@@ -292,22 +354,22 @@ max-width: 100%;
                             ✏️
                         </a>
                         <!-- Delete icon link -->
-                        <a href="#delete-{{ product.pk }}" class="action-btn delete">🗑️</a>
+                        <!-- <a href="#delete-{{ product.pk }}" class="action-btn delete">🗑️</a> -->
 
                         <!-- Modal Box -->
-                        <div id="delete-{{ product.pk }}" class="modal">
+                        <!-- <div id="delete-{{ product.pk }}" class="modal">
                             <div class="modal-content">
                                 <h3>Confirm Deletion</h3>
                                 <p>Are you sure you want to delete <strong>{{ product.product_name }}</strong>?</p>
                                 <div class="modal-actions">
-                                    <form method="post" action="{% url 'products:product_delete_view' product.pk %}">
+                                    <form method="post" action="">
                                         {% csrf_token %}
                                         <button type="submit" class="confirm-btn">Yes, Delete</button>
                                     </form>
                                     <a href="#" class="cancel-btn">Cancel</a>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
                     </div>
                 </td>
@@ -320,5 +382,62 @@ max-width: 100%;
             {% endif %}
         </tbody>
     </table>
+
+
+<!-- Modal Backdrop -->
+<div id="categoryModal" class="modal hidden">
+    <div class="modal-content">
+        
+        <h3>Add Product Category</h3>
+
+        <form id="categoryForm" method="POST" action="{% url 'products:category_create_view' %}">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="categoryName">Category Name</label>
+                <input type="text" id="categoryName" name="cat_name" required>
+            </div>
+
+            <button type="submit" class="save-btn">Save</button>
+        </form>
+
+        <button class="close-btn" id="closeCategoryModalBtn">×</button>
+    </div>
+</div>
+
 </div>
 {% endblock %}
+
+
+{% block extra_js %}
+
+const modal = document.getElementById("categoryModal");
+const openBtn = document.getElementById("openCategoryModalBtn");
+const closeBtn = document.getElementById("closeCategoryModalBtn");
+
+// Open modal
+openBtn.addEventListener("click", () => {
+    modal.classList.remove("hidden");
+});
+
+// Close modal
+closeBtn.addEventListener("click", () => {
+    modal.classList.add("hidden");
+});
+
+// Close when clicking backdrop
+modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+        modal.classList.add("hidden");
+    }
+});
+
+// Close with ESC
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+        modal.classList.add("hidden");
+    }
+});
+
+
+{% endblock extra_js %}

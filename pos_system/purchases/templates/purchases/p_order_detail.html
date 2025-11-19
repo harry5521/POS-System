@@ -94,6 +94,7 @@
             <p><strong>Invoice Number:</strong> {{ order.invoice_number }}</p>
             <p><strong>Vendor:</strong> {{ order.vendor.vendor_name }}</p>
             <p><strong>Purchase Date:</strong> {{ order.purchase_date }}</p>
+            <p><strong>Created By:</strong> {{ order.created_by }}</p>
             <p><strong>Total Amount:</strong> Rs. {{ order.total_amount }}</p>
             <p><strong>Remaining Amount:</strong> Rs. {{ order.remaining_amount }}</p>
             <p><strong>Notes:</strong> {{ order.notes|default:"—" }}</p>

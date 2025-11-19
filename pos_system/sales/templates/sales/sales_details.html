@@ -94,9 +94,11 @@
             <p><strong>Invoice Number:</strong> {{ order.invoice_number }}</p>
             <p><strong>Customer:</strong> {{ order.customer.name }}</p>
             <p><strong>Sales Date:</strong> {{ order.sale_date }}</p>
+            <p><strong>Created By:</strong> {{ order.created_by }}</p>
             <p><strong>Grand Total:</strong> Rs. {{ order.subtotal }}</p>
             <p><strong>Discount:</strong> Rs. {{ order.discount }}</p>
             <p><strong>Final Total:</strong> Rs. {{ order.total_amount }}</p>
+            <p><strong>Paid Amount:</strong> Rs. {{ order.paid_amount }}</p>
             <p><strong>Remaining Amount:</strong> Rs. {{ order.remaining_amount }}</p>
             <p><strong>Notes:</strong> {{ order.notes|default:"—" }}</p>
             <p><strong>Status:</strong>

@@ -3,6 +3,12 @@ from vendor.models import Vendor
 
 # Create your models here.
 
+class Category(models.Model):
+    cat_name = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.cat_name
+
 class Product(models.Model):
     product_name = models.CharField(max_length=100)
     barcode = models.CharField(max_length=100, unique=True)
@@ -11,7 +17,8 @@ class Product(models.Model):
     quantity = models.PositiveIntegerField()
     low_stock = models.PositiveIntegerField()
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name="products")
-    category = models.CharField(max_length=50, blank=True, null=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return f"{self.product_name} - {self.barcode}"
+    

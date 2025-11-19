@@ -4,6 +4,7 @@ from products.models import Product
 from customer.models import Customer
 from django.contrib.auth.models import User
 import string, random
+from decimal import Decimal
 
 # Create your models here.
 
@@ -46,6 +47,7 @@ class SalesOrder(models.Model):
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     discount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    paid_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     remaining_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="unpaid")
@@ -62,18 +64,19 @@ class SalesOrder(models.Model):
         verbose_name_plural = "Sales Orders"
 
     def __str__(self):
-        return f"Sales #{self.invoice_number} - {self.customer.name}"
+        return f"{self.order_id} - #{self.invoice_number}"
 
     @property
     def due_amount(self):
         """Return how much the customer still owes."""
         return max(self.total_amount - self.paid_amount, 0)
-
+    
     def update_customer_balance(self):
         """Adjust customer's current balance after sale."""
         if self.customer:
-            self.customer.current_balance += self.due_amount
+            self.customer.current_balance += Decimal(self.total_amount)
             self.customer.save(update_fields=['current_balance'])
+
 
 
 

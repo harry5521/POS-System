@@ -41,7 +41,7 @@ class PurchaseOrder(models.Model):
     order_id = models.CharField(unique=True, max_length=20, default=generate_order_id)
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name="purchase_orders")
     invoice_number = models.CharField(max_length=50, unique=True, default=generate_invoice_number, editable=False)
-    purchase_date = models.DateField(default=timezone.now)
+    purchase_date = models.DateTimeField(default=timezone.now)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     remaining_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     notes = models.TextField(blank=True, null=True)

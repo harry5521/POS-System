@@ -1,5 +1,5 @@
 from django import forms
-from .models import Product
+from .models import Product, Category
 from vendor.models import Vendor
 
 class ProductForm(forms.ModelForm):
@@ -46,12 +46,7 @@ class ProductForm(forms.ModelForm):
             'category': forms.Select(attrs={
                 'class': 'input-field',
                 'required': False
-            }, choices=[
-                ('', 'Select Category'),
-                ('grocery', 'Grocery'),
-                ('electronics', 'Electronics'),
-                ('furniture', 'Furniture')
-            ]),
+            },),
             'vendor': forms.Select(attrs={
                 'class': 'input-field',
                 'required': True
@@ -60,6 +55,8 @@ class ProductForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['category'].queryset = Category.objects.all()
+        self.fields['category'].empty_label = "Select Category"
         self.fields['vendor'].queryset = Vendor.objects.all()
         self.fields['vendor'].empty_label = "Select Vendor"
 

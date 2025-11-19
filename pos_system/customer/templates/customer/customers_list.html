@@ -278,7 +278,7 @@ max-width: 100%;
                 <td>{{ customer.name }}</td>
                 <td>{{ customer.phone }}</td>
                 <td>{{ customer.email }}</td>
-                <td>{{ customer.address }}</td>
+                <td>{{ customer.address|default:"-----" }}</td>
                 <td>{{ customer.current_balance }}</td>
                 <td>{{ customer.status }}</td>
                 <td>
@@ -288,22 +288,22 @@ max-width: 100%;
                             ✏️
                         </a>
                         <!-- Delete icon link -->
-                        <a href="#delete-{{ customer.pk }}" class="action-btn delete">🗑️</a>
+                        <!-- <a href="#delete-{{ customer.pk }}" class="action-btn delete">🗑️</a> -->
 
                         <!-- Modal Box -->
-                        <div id="delete-{{ customer.pk }}" class="modal">
+                        <!-- <div id="delete-{{ customer.pk }}" class="modal">
                             <div class="modal-content">
                                 <h3>Confirm Deletion</h3>
                                 <p>Are you sure you want to delete <strong>{{ customer.name }}</strong>?</p>
                                 <div class="modal-actions">
-                                    <form method="post" action="{% url 'customer:customer_delete_view' customer.pk %}">
+                                    <form method="post" action="">
                                         {% csrf_token %}
                                         <button type="submit" class="confirm-btn">Yes, Delete</button>
                                     </form>
                                     <a href="#" class="cancel-btn">Cancel</a>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
                     </div>
                 </td>

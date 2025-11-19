@@ -5,11 +5,25 @@ from django.views.generic.edit import FormView, CreateView, DeleteView, UpdateVi
 from django.views.generic import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from .models import Product
+from .models import Product, Category
 from .forms import ProductForm
 from django.db.models import Q
 
 # Create your views here.
+
+class CategoryCreateView(View):
+    def post(self, request, *args, **kwargs):
+        cat_name = request.POST.get("cat_name")
+
+        if not cat_name or cat_name.strip() == "":
+            messages.error(request, "Category Name is Required")
+            return redirect("products:products_list_view")
+
+        Category.objects.create(cat_name=cat_name.strip())
+
+        messages.success(request, "Category added successfully!")
+        return redirect("products:products_list_view")
+
 
 class ProductFormView(LoginRequiredMixin, CreateView):
     model = Product
@@ -35,10 +49,13 @@ class ProductListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         query = self.request.GET.get('product-search', '')
 
-        products = Product.objects.all()
+        products = Product.objects.all().select_related('category')
         if query:
-            products = Product.objects.filter(
-                Q(product_name__icontains=query) | Q(barcode__icontains=query)
+            products = products.filter(
+                Q(product_name__icontains=query) | 
+                Q(barcode__icontains=query) |
+                Q(vendor__vendor_name__icontains=query)
+
             )
         return products
     

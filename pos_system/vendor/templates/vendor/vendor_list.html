@@ -287,22 +287,22 @@ max-width: 100%;
                             ✏️
                         </a>
                         <!-- Delete icon link -->
-                        <a href="#delete-{{ vendor.pk }}" class="action-btn delete">🗑️</a>
+                        <!-- <a href="#delete-{{ vendor.pk }}" class="action-btn delete">🗑️</a> -->
 
                         <!-- Modal Box -->
-                        <div id="delete-{{ vendor.pk }}" class="modal">
+                        <!-- <div id="delete-{{ vendor.pk }}" class="modal">
                             <div class="modal-content">
                                 <h3>Confirm Deletion</h3>
                                 <p>Are you sure you want to delete <strong>{{ vendor.vendor_name }}</strong>?</p>
                                 <div class="modal-actions">
-                                    <form method="post" action="{% url 'vendor:vendor_delete_view' vendor.pk %}">
+                                    <form method="post" action="">
                                         {% csrf_token %}
                                         <button type="submit" class="confirm-btn">Yes, Delete</button>
                                     </form>
                                     <a href="#" class="cancel-btn">Cancel</a>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
                     </div>
                 </td>
