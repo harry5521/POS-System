@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from django.views.generic.edit import FormView, CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.views import View
 from .models import Payment
@@ -24,7 +25,7 @@ def clear_pending_payment(request):
             pass
 
 
-class PaymentListView(ListView):
+class PaymentListView(LoginRequiredMixin, ListView):
     model = Payment
     template_name = 'payments/payments_list.html'
     context_object_name = 'payments'
@@ -43,7 +44,7 @@ class PaymentListView(ListView):
         return payments
     
 
-class PaymentFormView(View):
+class PaymentFormView(LoginRequiredMixin, View):
     template_name = "payments/payment_form.html"
 
     def get(self, request):
@@ -91,7 +92,7 @@ class PaymentFormView(View):
         return render(request, self.template_name, {"form": form})
 
 
-class CancelPaymentView(View):
+class CancelPaymentView(LoginRequiredMixin, View):
     def get(self, request):
         print(request.session["pending_payment"])
         clear_pending_payment(request)
@@ -100,14 +101,14 @@ class CancelPaymentView(View):
         messages.info(request, "Payment process cancelled.")
         return redirect("payments:payments_list_view")
 
-class PaymentConfirmView(View):
+class PaymentConfirmView(LoginRequiredMixin, View):
     template_name = "payments/payment_confirm.html"
 
     def get(self, request):
         data = request.session.get("pending_payment")
         if not data:
             messages.error(request, "No payment data found.")
-            return redirect("payments:add_payment")
+            return redirect("payments:payment_form_view")
 
         context = {"data": data}
 
@@ -133,7 +134,7 @@ class PaymentConfirmView(View):
         data = request.session.get("pending_payment")
         if not data:
             messages.error(request, "Session expired. Please record payment again.")
-            return redirect("payments:payments_form_view")
+            return redirect("payments:payment_form_view")
 
         try:
             with transaction.atomic():
@@ -159,7 +160,8 @@ class PaymentConfirmView(View):
                 del request.session["pending_payment"]
 
             messages.success(request, f"✅ Payment of {payment.amount} recorded successfully!")
-            return redirect("payments:payments_list_view")
+            return redirect("payments:payment_receipt", payment_id=payment.id)
+
 
         except ValueError as e:
             # Logical/validation error from apply_payment
@@ -170,3 +172,18 @@ class PaymentConfirmView(View):
             # Any unexpected issue
             messages.error(request, f"❌ An unexpected error occurred: {str(e)}")
             return redirect("payments:payment_confirm_view")
+
+
+class PaymentReceiptView(DetailView):
+    model = Payment
+    template_name = "payments/payment_recipt.html"
+    context_object_name = "payment"
+    pk_url_kwarg = "payment_id"   # URL will contain <payment_id>
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Add extra useful info for the receipt
+        context["request"] = self.request
+
+        return context

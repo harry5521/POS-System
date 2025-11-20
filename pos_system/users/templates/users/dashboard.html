@@ -4,59 +4,137 @@
 
 {% block extra_css %}
   /* Dashboard Content */
-    .content {
-      text-align: center;
-      padding: 2rem 1rem;
-    }
+  .content {
+    text-align: left; /* left-align everything */
+    padding: 2.5rem 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
 
-    .content h2 {
-      font-size: 1.4rem;
-      margin-bottom: 2rem;
-      color: #0f172a;
-    }
+  .welcome {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 2.5rem;
+    color: #0f172a;
+  }
 
-    /* Dashboard Buttons Grid */
-    .button-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 1.5rem;
-      max-width: 800px;
-      margin: 0 auto;
-    }
+  .welcome span {
+    color: #38bdf8; /* highlight username */
+  }
 
-    .dashboard-btn {
-      background-color: #38bdf8; /* lighter sky blue */
-      border: none;
-      color: white;
-      font-size: 1rem;
-      padding: 1rem;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      transition: all 0.25s ease;
-    }
+  /* Quick Actions */
+  .quick-actions {
+    margin-bottom: 3rem;
+    display: flex;
+    gap: 10px;
+  }
 
-    .dashboard-btn:hover {
-      background-color: #0ea5e9;
-      transform: translateY(-3px);
-    }
+  .quick-btn {
+    background-color: #facc15; /* amber */
+    border: none;
+    color: #0f172a;
+    font-size: 15px;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+    transition: all 0.25s ease;
+    font-weight: 500;
+  }
+
+  .quick-btn:hover {
+    background-color: #fbbf24;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+  }
+
+  /* Dashboard Buttons Grid */
+  .button-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+  }
+
+  .dashboard-btn {
+    background-color: #38bdf8; /* sky blue */
+    border: none;
+    color: white;
+    font-size: 1.05rem;
+    padding: 1rem;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transition: all 0.25s ease;
+    font-weight: 500;
+    min-width: 160px; /* ensures all buttons consistent width */
+    text-align: center;
+  }
+
+  .dashboard-btn:hover {
+    background-color: #0ea5e9;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+  }
+
+  /* Footer Styling */
+.dashboard-footer {
+  background-color: #f1f5f9; /* light background to match theme */
+  padding: 1rem 2rem;
+  text-align: center;
+  margin-top: 3rem;
+  border-top: 1px solid #e2e8f0;
+  font-size: 0.95rem;
+  color: #0f172a;
+}
+
+.dashboard-footer .footer-content span {
+  color: #38bdf8; /* match highlight color of username */
+  font-weight: 600;
+}
+
+.dashboard-footer p {
+  margin: 0.3rem 0;
+}
+
+.dashboard-footer p:first-child {
+  margin-bottom: 0.5rem;
+}
+
 
 {% endblock extra_css %}
 
-
 {% block content %}
-
-  <div class="content">
-    <h2>Welcome, {{ request.user.username }}</h2>
-    <div class="button-grid">
-      <button class="dashboard-btn" onclick="location.href='{% url 'products:products_list_view' %}'">Products</button>
-      <button class="dashboard-btn" onclick="location.href='{% url 'customer:customer_list_view' %}'">Customers</button>
-      <button class="dashboard-btn" onclick="location.href='{% url 'purchases:purchase_list_view' %}'">Purchase Orders</button>
-      <button class="dashboard-btn" onclick="location.href='{% url 'sales:sales_list_view' %}'">Sales</button>
-      <button class="dashboard-btn" onclick="location.href='{% url 'vendor:vendor_list_view' %}'">Vendors</button>
-      <button class="dashboard-btn" onclick="location.href='{% url 'payments:payments_list_view' %}'">Payments</button>
-      <button class="dashboard-btn" onclick="location.href='#'">Reports</button>
-    </div>
+<div class="content">
+  <!-- Quick Actions left above greeting -->
+  <div class="quick-actions">
+    <button class="quick-btn" onclick="location.href='{% url 'sales:create_sales_order' %}'">+ New Sale</button>
+    <button class="quick-btn" onclick="location.href='{% url 'payments:payment_form_view' %}'">+ New Payment</button>
   </div>
+
+  <!-- Attractive Welcome -->
+  <div class="welcome">
+    Welcome, <span>{{ request.user.username }}</span>! 👋
+  </div>
+
+  <!-- Main Dashboard Buttons -->
+  <div class="button-grid">
+    <button class="dashboard-btn" onclick="location.href='{% url 'products:products_list_view' %}'">Products</button>
+    <button class="dashboard-btn" onclick="location.href='{% url 'purchases:purchase_list_view' %}'">Purchase Orders</button>
+    <button class="dashboard-btn" onclick="location.href='{% url 'sales:sales_list_view' %}'">Sales Orders</button>
+    <button class="dashboard-btn" onclick="location.href='{% url 'customer:customer_list_view' %}'">Customers</button>
+    <button class="dashboard-btn" onclick="location.href='{% url 'vendor:vendor_list_view' %}'">Vendors</button>
+    <button class="dashboard-btn" onclick="location.href='{% url 'payments:payments_list_view' %}'">Payments</button>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="dashboard-footer">
+  <div class="footer-content">
+    <p>Developed by <span>Abu Huraira</span> | Phone: 0315-0101057</p>
+    <p>&copy; {{ now|date:"Y" }} All rights reserved.</p>
+  </div>
+</footer>
+
 
 {% endblock content %}

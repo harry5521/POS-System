@@ -22,10 +22,10 @@ class PurchaseListView(LoginRequiredMixin, ListView):
         p_orders = PurchaseOrder.objects.all().order_by("-created_at").prefetch_related("purchase_order_items", "vendor")
         if query:
             p_orders = p_orders.filter(
+                Q(status__contains=query) |
                 Q(order_id__icontains=query) |
                 Q(vendor__vendor_name__icontains=query) |
-                Q(invoice_number__icontains=query) |
-                Q(status__icontains=query)
+                Q(invoice_number__icontains=query)
             )
         return p_orders
 

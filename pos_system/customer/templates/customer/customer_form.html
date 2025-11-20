@@ -134,14 +134,18 @@ font-size: 13px;
                 {{ form.phone }}
             </div>
             {% if form.name.errors %}
+            {% for error in form.name.errors %}
             <div class="form-row" style="color: red; font-size: 0.9rem;">
-                {{ form.name.errors.1 }}
+                {{ error }}
             </div>
+            {% endfor %}
             {% endif %}
             {% if form.phone.errors %}
+            {% for error in form.phone.errors %}
             <div class="form-row" style="color: red; font-size: 0.9rem;">
-                {{ form.phone.errors.1 }}
+                {{ error }}
             </div>
+            {% endfor %}
             {% endif %}
 
             <!-- Email & Address -->

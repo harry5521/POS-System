@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Payment Receipt</title>
+<style>
+    body {
+        width: 58mm;
+        font-size: 12px;
+        font-family: 'monospace';
+        margin: 0;
+        padding: 0;
+    }
+    .center { text-align: center; }
+    .line { border-top: 1px dashed #000; margin: 5px 0; }
+    table { width: 100%; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<div class="center">
+    <h3>POS System</h3>
+    <p>Address: Baldia Town, Karachi</p>
+</div>
+
+<div class="line"></div>
+
+<!-- Payment info -->
+<table>
+    <tr><td>Date:</td><td>{{ payment.payment_date }}</td></tr>
+    <tr><td>Cashier:</td><td>{{ payment.created_by.username }}</td></tr>
+</table>
+
+<div class="line"></div>
+
+<table>
+    <tr><td>Payment For:</td><td>{{ payment.get_payment_type_display }}</td></tr>
+    <tr><td>Method:</td><td>{{ payment.get_payment_method_display }}</td></tr>
+
+    {% if payment.customer %}
+    <tr><td>Customer:</td><td>{{ payment.customer.name }}</td></tr>
+    {% endif %}
+
+    {% if payment.vendor %}
+    <tr><td>Vendor:</td><td>{{ payment.vendor.vendor_name }}</td></tr>
+    {% endif %}
+</table>
+
+<div class="line"></div>
+
+<!-- Sales or Purchase order details -->
+{% if payment.sales_order %}
+<table>
+    <tr><td>Order ID:</td><td>{{ payment.sales_order.order_id }}</td></tr>
+    <tr><td>#Invoice:</td><td>{{ payment.sales_order.invoice_number }}</td></tr>
+    <tr><td>Subtotal:</td><td>{{ payment.sales_order.subtotal }}</td></tr>
+    <tr><td>Discount:</td><td>{{ payment.sales_order.discount }}</td></tr>
+    <tr><td><b>Total:</b></td><td><b>{{ payment.sales_order.total_amount }}</b></td></tr>
+</table>
+<div class="line"></div>
+{% elif payment.purchase_order %}
+<table>
+    <tr><td>Order ID:</td><td>{{ payment.purchase_order.order_id }}</td></tr>
+    <tr><td>#Invoice:</td><td>{{ payment.purchase_order.invoice_number }}</td></tr>
+    <tr><td>Total Amount:</td><td>{{ payment.purchase_order.total_amount }}</td></tr>
+    <tr><td>Remaining Amount:</td><td>{{ payment.purchase_order.remaining_amount }}</td></tr>
+    <tr><td>Status:</td><td>{{ payment.purchase_order.get_status_display }}</td></tr>
+</table>
+<div class="line"></div>
+{% endif %}
+
+<h3>Total Paid: {{ payment.amount }}</h3>
+
+<div class="center">
+    <p>Thank you!</p>
+</div>
+
+<script>
+window.onload = function() {
+    window.print();
+    window.onafterprint = function() {
+        window.location.href = "{% url 'payments:payments_list_view' %}";
+    };
+};
+</script>
+
+</body>
+</html>

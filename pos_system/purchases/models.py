@@ -51,7 +51,7 @@ class PurchaseOrder(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Purchase - #{self.invoice_number} - {self.vendor.vendor_name}"
+        return f"{self.order_id} - #{self.invoice_number}"
     
 
 class PurchaseOrderItem(models.Model):

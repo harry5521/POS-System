@@ -27,10 +27,10 @@ class SalesListView(ListView):
 
         if query:
             sales = sales.filter(
+                Q(status__contains=query) |
                 Q(order_id__icontains=query) |
                 Q(invoice_number__icontains=query) |
-                Q(customer__name__icontains=query) |
-                Q(status__icontains=query)
+                Q(customer__name__icontains=query)
             )
         return sales
 
