@@ -1,7 +1,7 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic.edit import FormView, CreateView, DeleteView, UpdateView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
@@ -11,7 +11,7 @@ from django.db.models import Q
 
 # Create your views here.
 
-class CategoryCreateView(View):
+class CategoryCreateView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         cat_name = request.POST.get("cat_name")
 

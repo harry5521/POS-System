@@ -1,22 +1,19 @@
 from django.shortcuts import render, get_object_or_404, redirect
-import json
 from django.http import JsonResponse
-from django.db import transaction
 from django.urls import reverse_lazy, reverse
 from django.views import View
 from django.views.generic import ListView, DetailView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
+from django.views.generic.edit import CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.contrib import messages
 from .models import SalesOrder, SalesOrderItem
 from .forms import SalesOrderForm
 from products.models import Product
-from customer.models import Customer
 
 # Create your views here.
 
-class SalesListView(ListView):
+class SalesListView(LoginRequiredMixin, ListView):
     model = SalesOrder
     template_name = 'sales/sales_list.html'
     context_object_name = 'sales_orders'
@@ -63,7 +60,6 @@ class SalesOrderItemsFormView(LoginRequiredMixin, View):
         order = get_object_or_404(SalesOrder, pk=order_id)
         product = request.POST.getlist("product[]")
         quantity = request.POST.getlist("quantity[]")
-        gand_total = request.POST.get("grand_total")
         discount = request.POST.get("discount")
         final_total = request.POST.get("final_total")
 

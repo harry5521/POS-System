@@ -1,10 +1,10 @@
-from django.shortcuts import render, HttpResponse, redirect
-from django.urls import reverse_lazy
+from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from django.contrib.auth.models import User
+from products.models import Product
+from django.db.models import F
 
 # Create your views here.
 
@@ -36,4 +36,6 @@ class LogoutView(LoginRequiredMixin, View):
 
 class DashboardView(LoginRequiredMixin, View):
     def get(self, request):
-        return render(request, 'users/dashboard.html')
+        products = Product.objects.filter(quantity__lte=F('low_stock'))
+        context = {"products": products}
+        return render(request, 'users/dashboard.html', context)

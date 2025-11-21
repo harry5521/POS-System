@@ -3,84 +3,140 @@
 {% block title %}Dashboard{% endblock title %}
 
 {% block extra_css %}
-  /* Dashboard Content */
-  .content {
-    text-align: left; /* left-align everything */
-    padding: 2.5rem 2rem;
-    max-width: 1000px;
-    margin: 0 auto;
-  }
-
-  .welcome {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 2.5rem;
-    color: #0f172a;
-  }
-
-  .welcome span {
-    color: #38bdf8; /* highlight username */
-  }
-
-  /* Quick Actions */
-  .quick-actions {
-    margin-bottom: 3rem;
-    display: flex;
-    gap: 10px;
-  }
-
-  .quick-btn {
-    background-color: #facc15; /* amber */
-    border: none;
-    color: #0f172a;
-    font-size: 15px;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    cursor: pointer;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
-    transition: all 0.25s ease;
-    font-weight: 500;
-  }
-
-  .quick-btn:hover {
-    background-color: #fbbf24;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
-  }
-
-  /* Dashboard Buttons Grid */
-  .button-grid {
+/* MAIN GRID ---------------------------------------------------- */
+.dashboard-wrapper {
+    min-height: 65vh;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: 60% 35%;
+    gap: 60px;
     width: 100%;
-  }
+    max-width: 1250px;
+    margin: 40px auto;
+}
 
-  .dashboard-btn {
-    background-color: #38bdf8; /* sky blue */
+/* LEFT PANEL --------------------------------------------------- */
+.left-panel {
+    width: 100%;
+}
+
+.quick-actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 50px;
+}
+
+.quick-btn {
+    background: #facc15;
     border: none;
-    color: white;
-    font-size: 1.05rem;
-    padding: 1rem;
-    border-radius: 10px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
     cursor: pointer;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-    transition: all 0.25s ease;
+}
+
+.quick-btn:hover {
+    background: #fbbf24;
+}
+
+/* Greeting */
+.welcome {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 25px;
+}
+
+.welcome span {
+    color: #38bdf8;
+}
+
+/* Dashboard Buttons Grid */
+.button-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.dashboard-btn {
+    background: #38bdf8;
+    color: #fff;
+    border: none;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 1.1rem;
     font-weight: 500;
-    min-width: 160px; /* ensures all buttons consistent width */
-    text-align: center;
-  }
+    cursor: pointer;
+    transition: 0.25s;
+}
 
-  .dashboard-btn:hover {
-    background-color: #0ea5e9;
+.dashboard-btn:hover {
+    background: #0ea5e9;
     transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-  }
+}
 
-  /* Footer Styling */
+/* RIGHT PANEL --------------------------------------------------- */
+.right-panel {
+    width: 100%;
+}
+
+.low-stock-card {
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    margin-top: 140px;
+    overflow: hidden;
+}
+
+.low-stock-card-header {
+    background: #e0f2fe;
+    color: #0369a1;
+    font-weight: bold;
+    padding: 12px 16px;
+    border-bottom: 1px solid #bae6fd;
+}
+
+.low-stock-empty {
+    padding: 18px;
+    text-align: center;
+    font-weight: 600;
+    color: #475569;
+}
+
+.low-stock-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.low-stock-item {
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 15px;
+}
+
+/* Badges */
+.badge-critical {
+    background: #dc2626;
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.badge-low {
+    background: #facc15;
+    color: #78350f;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+/* Footer Styling */
 .dashboard-footer {
   background-color: #f1f5f9; /* light background to match theme */
-  padding: 1rem 2rem;
+  padding: 1.5rem 2rem;
   text-align: center;
   margin-top: 3rem;
   border-top: 1px solid #e2e8f0;
@@ -102,36 +158,72 @@
 }
 
 
+
 {% endblock extra_css %}
 
 {% block content %}
-<div class="content">
-  <!-- Quick Actions left above greeting -->
-  <div class="quick-actions">
-    <button class="quick-btn" onclick="location.href='{% url 'sales:create_sales_order' %}'">+ New Sale</button>
-    <button class="quick-btn" onclick="location.href='{% url 'payments:payment_form_view' %}'">+ New Payment</button>
-  </div>
+<!-- MAIN WRAPPER (grid layout) -->
+<div class="dashboard-wrapper">
 
-  <!-- Attractive Welcome -->
-  <div class="welcome">
-    Welcome, <span>{{ request.user.username }}</span>! 👋
-  </div>
+    <!-- LEFT SIDE 70% -->
+    <div class="left-panel">
 
-  <!-- Main Dashboard Buttons -->
-  <div class="button-grid">
-    <button class="dashboard-btn" onclick="location.href='{% url 'products:products_list_view' %}'">Products</button>
-    <button class="dashboard-btn" onclick="location.href='{% url 'purchases:purchase_list_view' %}'">Purchase Orders</button>
-    <button class="dashboard-btn" onclick="location.href='{% url 'sales:sales_list_view' %}'">Sales Orders</button>
-    <button class="dashboard-btn" onclick="location.href='{% url 'customer:customer_list_view' %}'">Customers</button>
-    <button class="dashboard-btn" onclick="location.href='{% url 'vendor:vendor_list_view' %}'">Vendors</button>
-    <button class="dashboard-btn" onclick="location.href='{% url 'payments:payments_list_view' %}'">Payments</button>
-  </div>
+        <div class="quick-actions">
+            <button class="quick-btn" onclick="location.href='{% url 'sales:create_sales_order' %}'">+ New Sale</button>
+            <button class="quick-btn" onclick="location.href='{% url 'payments:payment_form_view' %}'">+ New Payment</button>
+        </div>
+
+        <div class="welcome">
+            Welcome, <span>{{ request.user.username }}</span>! 👋
+        </div>
+
+        <div class="button-grid">
+            <button class="dashboard-btn" onclick="location.href='{% url 'products:products_list_view' %}'">Products</button>
+            <button class="dashboard-btn" onclick="location.href='{% url 'purchases:purchase_list_view' %}'">Purchase Orders</button>
+            <button class="dashboard-btn" onclick="location.href='{% url 'sales:sales_list_view' %}'">Sales Orders</button>
+            <button class="dashboard-btn" onclick="location.href='{% url 'customer:customer_list_view' %}'">Customers</button>
+            <button class="dashboard-btn" onclick="location.href='{% url 'vendor:vendor_list_view' %}'">Vendors</button>
+            <button class="dashboard-btn" onclick="location.href='{% url 'payments:payments_list_view' %}'">Payments</button>
+        </div>
+
+    </div>
+
+    <!-- RIGHT SIDE 30% -->
+    <div class="right-panel">
+        <div class="low-stock-card">
+
+            <div class="low-stock-card-header">Low Stock Alerts</div>
+
+            <!-- Empty -->
+            {% if products|length == 0 %}
+            <div class="low-stock-empty">No product has low stock</div>
+            {% else %}
+
+            <!-- Example list -->
+            {% for product in products %}
+            <ul class="low-stock-list">
+                <li class="low-stock-item">
+                  {{ product.product_name }}
+                  {% if product.quantity <= 0 %}
+                  <span class="badge-critical">Out of Stock</span>
+                  {% else %}
+                  <span class="badge-low">{{ product.quantity }}</span>
+                  {% endif %}
+                </li>
+            </ul>
+            {% endfor %}
+
+            {% endif %}
+
+        </div>
+    </div>
+
 </div>
 
 <!-- Footer -->
 <footer class="dashboard-footer">
   <div class="footer-content">
-    <p>Developed by <span>Abu Huraira</span> | Phone: 0315-0101057</p>
+    <p>Developed by <span>Huraira Gulfaraz</span> | Software Engineering Student</p>
     <p>&copy; {{ now|date:"Y" }} All rights reserved.</p>
   </div>
 </footer>
