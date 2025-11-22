@@ -120,6 +120,51 @@ padding: 20px;
 color: #555;
 font-style: italic;
 }
+
+.pagination-container {
+display: flex;
+justify-content: center;
+margin: 20px 0px;
+}
+
+.pagination {
+list-style: none;
+display: flex;
+gap: 0.3rem;
+padding: 0;
+margin: 0;
+}
+
+.pagination li {
+padding: 0.5rem 0.7rem;
+background: #38bdf8;
+color: white;
+border-radius: 6px;
+font-size: 13px;
+cursor: pointer;
+transition: 0.2s;
+}
+
+.pagination li a {
+color: white;
+text-decoration: none;
+}
+
+.pagination li:hover {
+background: #0ea5e9;
+}
+
+.pagination .disabled {
+background: #94a3b8;
+cursor: not-allowed;
+}
+
+.pagination .active {
+background: #facc15;
+color: #0f172a;
+font-weight: bold;
+}
+
 /* Overlay */
 .modal {
 position: fixed;
@@ -227,6 +272,44 @@ max-width: 100%;
         </form>
     </div>
 
+    <div class="pagination-container">
+        <ul class="pagination">
+
+            {% if page_obj.has_previous %}
+            <li><a href="?page=1{% if search_query %}&vendor-search={{ search_query }}{% endif %}">&laquo; First</a></li>
+            <li><a
+                    href="?page={{ page_obj.previous_page_number }}{% if search_query %}&vendor-search={{ search_query }}{% endif %}">&lsaquo;
+                    Prev</a></li>
+            {% else %}
+            <li class="disabled">&laquo; First</li>
+            <li class="disabled">&lsaquo; Prev</li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            {% if num == page_obj.number %}
+            <li class="active">{{ num }}</li>
+            {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %} <li><a
+                    href="?page={{ num }}{% if search_query %}&vendor-search={{ search_query }}{% endif %}">{{ num }}</a>
+                </li>
+                {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li><a
+                        href="?page={{ page_obj.next_page_number }}{% if search_query %}&vendor-search={{ search_query }}{% endif %}">Next
+                        &rsaquo;</a></li>
+                <li><a
+                        href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&vendor-search={{ search_query }}{% endif %}">Last
+                        &raquo;</a></li>
+                {% else %}
+                <li class="disabled">Next &rsaquo;</li>
+                <li class="disabled">Last &raquo;</li>
+                {% endif %}
+
+        </ul>
+    </div>
+
+
     {% if messages %}
     {% for message in messages %}
     <div style="
@@ -293,7 +376,7 @@ max-width: 100%;
                         <!-- <div id="delete-{{ vendor.pk }}" class="modal">
                             <div class="modal-content">
                                 <h3>Confirm Deletion</h3>
-                                <p>Are you sure you want to delete <strong>{{ vendor.vendor_name }}</strong>?</p>
+                                <Are you sure you want to delete <strong>{{ vendor.vendor_name }}</strong>?</
                                 <div class="modal-actions">
                                     <form method="post" action="">
                                         {% csrf_token %}

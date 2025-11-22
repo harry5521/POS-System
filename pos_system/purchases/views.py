@@ -16,6 +16,7 @@ class PurchaseListView(LoginRequiredMixin, ListView):
     model = PurchaseOrder
     template_name = 'purchases/p_orders_list.html'
     context_object_name = 'p_orders'
+    paginate_by = 100
 
     def get_queryset(self):
         query = self.request.GET.get("p-order-search")
@@ -28,6 +29,11 @@ class PurchaseListView(LoginRequiredMixin, ListView):
                 Q(invoice_number__icontains=query)
             )
         return p_orders
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["search_query"] = self.request.GET.get("p-order-search", "")
+        return context
 
 
 class PurchaseOrderFormView(LoginRequiredMixin, CreateView):

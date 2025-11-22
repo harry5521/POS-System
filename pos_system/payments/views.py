@@ -27,6 +27,7 @@ class PaymentListView(LoginRequiredMixin, ListView):
     model = Payment
     template_name = 'payments/payments_list.html'
     context_object_name = 'payments'
+    paginate_by = 150
 
     def get_queryset(self):
         query = self.request.GET.get('payment-search', '')
@@ -41,6 +42,10 @@ class PaymentListView(LoginRequiredMixin, ListView):
             )
         return payments
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["search_query"] = self.request.GET.get("payment-search", "")
+        return context
 
 class PaymentFormView(LoginRequiredMixin, View):
     template_name = "payments/payment_form.html"

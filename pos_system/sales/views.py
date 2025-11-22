@@ -17,6 +17,7 @@ class SalesListView(LoginRequiredMixin, ListView):
     model = SalesOrder
     template_name = 'sales/sales_list.html'
     context_object_name = 'sales_orders'
+    paginate_by = 150
 
     def get_queryset(self):
         query = self.request.GET.get("sale-search", "")
@@ -30,6 +31,12 @@ class SalesListView(LoginRequiredMixin, ListView):
                 Q(customer__name__icontains=query)
             )
         return sales
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["search_query"] = self.request.GET.get("sale-search", "")
+        return context
+        
 
 
 class SalesOrderFormView(LoginRequiredMixin, CreateView):

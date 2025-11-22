@@ -27,6 +27,7 @@ class CustomerListView(LoginRequiredMixin, ListView):
     model = Customer
     template_name = 'customer/customers_list.html'
     context_object_name = 'customers'
+    paginate_by = 50
 
     def get_queryset(self):
         query = self.request.GET.get('customer-search', '')
@@ -36,6 +37,11 @@ class CustomerListView(LoginRequiredMixin, ListView):
                 Q(name__icontains=query) | Q(phone__icontains=query)
             )
         return customers
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["search_query"] = self.request.GET.get("customer-search", "")
+        return context
     
 
 class CustomerUpdateView(LoginRequiredMixin, UpdateView):

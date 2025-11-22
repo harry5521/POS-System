@@ -45,6 +45,7 @@ class ProductListView(LoginRequiredMixin, ListView):
     model = Product
     template_name = 'products/products_list.html'
     context_object_name = 'products'
+    paginate_by = 50
 
     def get_queryset(self):
         query = self.request.GET.get('product-search', '')
@@ -58,6 +59,11 @@ class ProductListView(LoginRequiredMixin, ListView):
 
             )
         return products
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["search_query"] = self.request.GET.get("product-search", "")
+        return context
     
 
 class ProductUpdateView(LoginRequiredMixin, UpdateView):

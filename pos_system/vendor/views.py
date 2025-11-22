@@ -32,6 +32,7 @@ class VendorListView(LoginRequiredMixin, ListView):
     model = Vendor
     template_name = 'vendor/vendor_list.html'
     context_object_name = 'vendors'
+    paginate_by = 50
 
     def get_queryset(self):
         query = self.request.GET.get('vendor-search', '')
@@ -42,6 +43,11 @@ class VendorListView(LoginRequiredMixin, ListView):
                 Q(vendor_name__icontains=query) | Q(email__icontains=query)
             )
         return vendors
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["search_query"] = self.request.GET.get("vendor-search", "")
+        return context
 
 class VendorUpdateView(LoginRequiredMixin, UpdateView):
     model = Vendor

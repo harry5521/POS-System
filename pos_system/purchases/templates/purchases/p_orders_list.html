@@ -66,7 +66,7 @@ border-radius: 6px;
 cursor: pointer;
 }
 
-.product-table {
+.p-order-table {
 font-size: 15px;
 width: 100%;
 border-collapse: collapse;
@@ -76,19 +76,19 @@ overflow: hidden;
 box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-.product-table th, .product-table td {
+.p-order-table th, .p-order-table td {
 padding: 12px 15px;
 text-align: center;
 border-bottom: 1px solid #ddd;
 }
 
-.product-table th {
+.p-order-table th {
 background: #0284c7;
 color: white;
 font-weight: normal;
 }
 
-.product-table tr:hover {
+.p-order-table tr:hover {
 background: #f1f9ff;
 }
 
@@ -136,6 +136,51 @@ padding: 20px;
 color: #555;
 font-style: italic;
 }
+
+.pagination-container {
+display: flex;
+justify-content: center;
+margin: 20px 0px;
+}
+
+.pagination {
+list-style: none;
+display: flex;
+gap: 0.3rem;
+padding: 0;
+margin: 0;
+}
+
+.pagination li {
+padding: 0.5rem 0.7rem;
+background: #38bdf8;
+color: white;
+border-radius: 6px;
+font-size: 13px;
+cursor: pointer;
+transition: 0.2s;
+}
+
+.pagination li a {
+color: white;
+text-decoration: none;
+}
+
+.pagination li:hover {
+background: #0ea5e9;
+}
+
+.pagination .disabled {
+background: #94a3b8;
+cursor: not-allowed;
+}
+
+.pagination .active {
+background: #facc15;
+color: #0f172a;
+font-weight: bold;
+}
+
 /* Overlay */
 .modal {
 position: fixed;
@@ -213,7 +258,7 @@ to { transform: scale(1); opacity: 1; }
 
 /* Responsive */
 @media (max-width: 768px) {
-.product-table th, .product-table td {
+.p-order-table th, .p-order-table td {
 padding: 8px;
 font-size: 14px;
 }
@@ -242,6 +287,44 @@ max-width: 100%;
             </div>
         </form>
     </div>
+
+    <div class="pagination-container">
+        <ul class="pagination">
+
+            {% if page_obj.has_previous %}
+            <li><a href="?page=1{% if search_query %}&p-order-search={{ search_query }}{% endif %}">&laquo; First</a></li>
+            <li><a
+                    href="?page={{ page_obj.previous_page_number }}{% if search_query %}&p-order-search={{ search_query }}{% endif %}">&lsaquo;
+                    Prev</a></li>
+            {% else %}
+            <li class="disabled">&laquo; First</li>
+            <li class="disabled">&lsaquo; Prev</li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            {% if num == page_obj.number %}
+            <li class="active">{{ num }}</li>
+            {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %} <li><a
+                    href="?page={{ num }}{% if search_query %}&p-order-search={{ search_query }}{% endif %}">{{ num }}</a>
+                </li>
+                {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li><a
+                        href="?page={{ page_obj.next_page_number }}{% if search_query %}&p-order-search={{ search_query }}{% endif %}">Next
+                        &rsaquo;</a></li>
+                <li><a
+                        href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&p-order-search={{ search_query }}{% endif %}">Last
+                        &raquo;</a></li>
+                {% else %}
+                <li class="disabled">Next &rsaquo;</li>
+                <li class="disabled">Last &raquo;</li>
+                {% endif %}
+
+        </ul>
+    </div>
+
 
     {% if messages %}
     {% for message in messages %}
@@ -274,7 +357,7 @@ max-width: 100%;
     {% endif %}
 
 
-    <table class="product-table">
+    <table class="p-order-table">
         <thead>
             <tr>
                 <th>#</th>
